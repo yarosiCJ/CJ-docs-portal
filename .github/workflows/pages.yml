@@ -1,0 +1,87 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout OpenAPI contract sources
+        uses: actions/checkout@v4
+        with:
+          repository: yarosiCJ/CJ_API_Refact
+          path: sources/contract
+
+      - name: Checkout Postman collection sources
+        uses: actions/checkout@v4
+        with:
+          repository: yarosiCJ/CJ_API_Sandbox
+          path: sources/collection
+
+      - name: Checkout integration scenarios sources
+        uses: actions/checkout@v4
+        with:
+          repository: yarosiCJ/CJ_API_Integration_Scenarios
+          path: sources/integration
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+
+      - name: Install dependencies
+        working-directory: website
+        run: npm ci
+
+      - name: Set Pages baseUrl/url env
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          echo "DOCS_URL=https://${GITHUB_REPOSITORY_OWNER}.github.io" >> "$GITHUB_ENV"
+          echo "DOCS_BASE_URL=/${REPO_NAME}/" >> "$GITHUB_ENV"
+
+      - name: Set sync inputs
+        run: |
+          echo "SOURCES_ROOT=${GITHUB_WORKSPACE}/sources" >> "$GITHUB_ENV"
+          echo "OPENAPI_SPEC_FILE=${GITHUB_WORKSPACE}/sources/contract/web/openapi.bundled.yaml" >> "$GITHUB_ENV"
+          echo "OPENAPI_SCHEMAS_DIR=${GITHUB_WORKSPACE}/sources/contract/openapi-built/components/schemas" >> "$GITHUB_ENV"
+          echo "COP_MD=${GITHUB_WORKSPACE}/sources/contract/docs/reference/cop.md" >> "$GITHUB_ENV"
+          echo "POSTMAN_COLLECTION=${GITHUB_WORKSPACE}/sources/collection/Clear_Junction_API.postman_collection.json" >> "$GITHUB_ENV"
+          echo "INTEGRATION_DOCS_DIR=${GITHUB_WORKSPACE}/sources/integration/docs" >> "$GITHUB_ENV"
+
+      - name: Build site
+        working-directory: website
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+

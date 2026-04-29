@@ -1,0 +1,40 @@
+---
+sidebar_position: 1
+---
+
+# Clear Junction API docs portal
+
+Этот репозиторий собирает **статический портал документации** для публикации в Pages:
+
+## Что где лежит
+
+- **API Reference**: [`/reference`](/reference) (рендер `openapi.yaml` через Redoc)
+- **OpenAPI файл**: [`/openapi/openapi.yaml`](/openapi/openapi.yaml)
+- **Postman**: [`/postman/Clear_Junction_API.postman_collection.json`](/postman/Clear_Junction_API.postman_collection.json)
+- **Доп.описания параметров**: `Docs → Reference → CoP` (подтягивается из исходного репозитория)
+- **Integration scenarios**: `Docs → Integration` (подтягивается из соседнего проекта)
+
+## Локальный preview
+
+Команды запуска (важно: перед `start/build` автоматически выполняется `sync`):
+
+```bash
+npm run start
+```
+
+Сборка статики:
+
+```bash
+npm run build
+```
+
+## Откуда берётся контент
+
+Скрипт `npm run sync` копирует в этот проект:
+
+- `openapi-built/openapi.yaml` + `openapi-built/components/schemas/*`
+- `docs/reference/cop.md`
+- Postman collection JSON
+- Markdown сценарии интеграции
+
+Пути можно переопределить через env vars: `OPENAPI_BUILT_DIR`, `COP_MD`, `POSTMAN_COLLECTION`, `INTEGRATION_DOCS_DIR`.
