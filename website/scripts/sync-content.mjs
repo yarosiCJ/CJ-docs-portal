@@ -31,6 +31,13 @@ async function copyFileIfExists(src, dst) {
   console.log(`[sync] file  ${src} -> ${dst}`);
 }
 
+async function firstExistingFile(candidates) {
+  for (const candidate of candidates) {
+    if (await exists(candidate)) return candidate;
+  }
+  return null;
+}
+
 async function copyDirIfExists(src, dst) {
   if (!(await exists(src))) {
     console.warn(`[sync] missing dir: ${src}`);
@@ -45,12 +52,21 @@ async function copyDirIfExists(src, dst) {
 // You can override any path via env vars when running locally or in CI.
 const SOURCES_ROOT = path.resolve(getEnv("SOURCES_ROOT", "/Users/yarosi/Documents/Python"));
 
-const OPENAPI_SPEC_FILE = path.resolve(
+const OPENAPI_SPEC_FILE_RAW = getEnv("OPENAPI_SPEC_FILE", "");
+const OPENAPI_SPEC_FALLBACK = path.resolve(
   getEnv(
-    "OPENAPI_SPEC_FILE",
+    "OPENAPI_SPEC_FALLBACK",
     path.join(SOURCES_ROOT, "ApiRefactoring", "openapi-built", "openapi.yaml"),
   ),
 );
+
+const OPENAPI_SPEC_FILE =
+  OPENAPI_SPEC_FILE_RAW.trim() !== ""
+    ? path.resolve(OPENAPI_SPEC_FILE_RAW)
+    : await firstExistingFile([
+        path.join(SOURCES_ROOT, "ApiRefactoring", "web", "openapi.bundled.yaml"),
+        OPENAPI_SPEC_FALLBACK,
+      ]);
 const OPENAPI_SCHEMAS_DIR = path.resolve(
   getEnv(
     "OPENAPI_SCHEMAS_DIR",
@@ -90,7 +106,11 @@ await ensureEmptyDir(dstPostmanDir);
 await ensureEmptyDir(dstIntegrationDir);
 await fs.mkdir(dstReferenceDir, { recursive: true });
 
-await copyFileIfExists(OPENAPI_SPEC_FILE, path.join(dstOpenApiDir, "openapi.yaml"));
+if (OPENAPI_SPEC_FILE) {
+  await copyFileIfExists(OPENAPI_SPEC_FILE, path.join(dstOpenApiDir, "openapi.yaml"));
+} else {
+  console.warn("[sync] missing OpenAPI spec file (no candidates found)");
+}
 await copyDirIfExists(OPENAPI_SCHEMAS_DIR, dstSchemasDir);
 
 await copyFileIfExists(POSTMAN_COLLECTION, path.join(dstPostmanDir, "Clear_Junction_API.postman_collection.json"));
