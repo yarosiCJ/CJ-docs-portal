@@ -5,6 +5,9 @@ on:
     branches: ["main"]
   workflow_dispatch: {}
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 permissions:
   contents: read
   pages: write
@@ -26,18 +29,21 @@ jobs:
         with:
           repository: yarosiCJ/CJ_API_Refact
           path: sources/contract
+          token: ${{ secrets.DOCS_SOURCES_TOKEN || github.token }}
 
       - name: Checkout Postman collection sources
         uses: actions/checkout@v4
         with:
           repository: yarosiCJ/CJ_API_Sandbox
           path: sources/collection
+          token: ${{ secrets.DOCS_SOURCES_TOKEN || github.token }}
 
       - name: Checkout integration scenarios sources
         uses: actions/checkout@v4
         with:
           repository: yarosiCJ/CJ_API_Integration_Scenarios
           path: sources/integration
+          token: ${{ secrets.DOCS_SOURCES_TOKEN || github.token }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
