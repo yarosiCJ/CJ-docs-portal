@@ -82,7 +82,7 @@ const config: Config = {
         },
         {to: '/reference', label: 'API', position: 'left'},
         {
-          href: '/postman/Clear_Junction_API.postman_collection.json',
+          to: '/postman/Clear_Junction_API.postman_collection.json',
           label: 'Postman',
           position: 'right',
         },
@@ -114,7 +114,7 @@ const config: Config = {
           items: [
             {
               label: 'Postman collection',
-              href: '/postman/Clear_Junction_API.postman_collection.json',
+              to: '/postman/Clear_Junction_API.postman_collection.json',
             },
           ],
         },
