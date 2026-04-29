@@ -24,26 +24,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Ensure DOCS_SOURCES_TOKEN is set
+        run: |
+          if [ -z "${{ secrets.DOCS_SOURCES_TOKEN }}" ]; then
+            echo "::error::Missing DOCS_SOURCES_TOKEN secret. Create a PAT with read access to CJ_API_Refact, CJ_API_Sandbox, CJ_API_Integration_Scenarios and add it as repo secret DOCS_SOURCES_TOKEN."
+            exit 1
+          fi
+
       - name: Checkout OpenAPI contract sources
         uses: actions/checkout@v4
         with:
           repository: yarosiCJ/CJ_API_Refact
           path: sources/contract
-          token: ${{ secrets.DOCS_SOURCES_TOKEN || github.token }}
+          token: ${{ secrets.DOCS_SOURCES_TOKEN }}
 
       - name: Checkout Postman collection sources
         uses: actions/checkout@v4
         with:
           repository: yarosiCJ/CJ_API_Sandbox
           path: sources/collection
-          token: ${{ secrets.DOCS_SOURCES_TOKEN || github.token }}
+          token: ${{ secrets.DOCS_SOURCES_TOKEN }}
 
       - name: Checkout integration scenarios sources
         uses: actions/checkout@v4
         with:
           repository: yarosiCJ/CJ_API_Integration_Scenarios
           path: sources/integration
-          token: ${{ secrets.DOCS_SOURCES_TOKEN || github.token }}
+          token: ${{ secrets.DOCS_SOURCES_TOKEN }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
