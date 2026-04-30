@@ -1,0 +1,29 @@
+---
+sidebar_position: 2
+title: Postman collection
+---
+
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# Postman collection
+
+A ready-to-import Postman collection for the Clear Junction API Sandbox environment is published alongside this portal.
+
+<a
+  className="button button--primary"
+  href={useBaseUrl('/postman/Clear_Junction_API.postman_collection.json')}>
+  Download Postman collection
+</a>
+
+## How to use
+
+1. Download the JSON file using the button above.
+2. In Postman, click **Import**.
+3. Import `Clear_Junction_API.postman_collection.json`.
+4. Review collection variables (`walletUuid`, `apiKey`, `apiPassword`, etc.) and adjust them for your environment.
+
+## Published file URL
+
+Direct JSON link: <a href={useBaseUrl('/postman/Clear_Junction_API.postman_collection.json')}>/postman/Clear_Junction_API.postman_collection.json</a>.
+
+During local dev and builds, the file is copied by `npm run sync` into `website/static/postman`.

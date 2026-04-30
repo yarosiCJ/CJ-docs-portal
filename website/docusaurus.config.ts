@@ -31,8 +31,8 @@ const config: Config = {
   // useful metadata like html lang. For example, if your site is Chinese, you
   // may want to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: 'ru',
-    locales: ['ru'],
+    defaultLocale: 'en',
+    locales: ['en'],
   },
 
   presets: [
@@ -82,7 +82,7 @@ const config: Config = {
         },
         {to: '/reference', label: 'API', position: 'left'},
         {
-          to: '/postman/Clear_Junction_API.postman_collection.json',
+          to: '/docs/postman',
           label: 'Postman',
           position: 'right',
         },
@@ -114,7 +114,7 @@ const config: Config = {
           items: [
             {
               label: 'Postman collection',
-              to: '/postman/Clear_Junction_API.postman_collection.json',
+              to: '/docs/postman',
             },
           ],
         },

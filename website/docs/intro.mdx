@@ -3,40 +3,42 @@ sidebar_position: 1
 ---
 
 import Link from '@docusaurus/Link';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Clear Junction API docs portal
 
-Этот репозиторий собирает **статический портал документации** для публикации в Pages:
+This repository builds a **static documentation portal** (for Pages deployment):
 
-## Что где лежит
+## What lives where
 
-- **API Reference**: <Link to="/reference">/reference</Link> (рендер `openapi.yaml` через Redoc)
-- **OpenAPI файл**: <Link to="/openapi/openapi.yaml">/openapi/openapi.yaml</Link>
-- **Postman**: <Link to="/postman/Clear_Junction_API.postman_collection.json">collection</Link>
-- **Доп.описания параметров**: `Docs → Reference → CoP` (подтягивается из исходного репозитория)
-- **Integration scenarios**: `Docs → Integration` (подтягивается из соседнего проекта)
+- **API Reference**: <Link to="/reference">/reference</Link> (renders `openapi.yaml` via Redoc)
+- **OpenAPI file**: <a href={useBaseUrl('/openapi/openapi.yaml')}>/openapi/openapi.yaml</a>
+- **Postman**: <Link to="/docs/postman">collection page</Link>
+- **Additional parameter descriptions**: `Docs → Reference → CoP` (synced from contract sources)
+- **Integration scenarios**: `Docs → Integration` (synced from integration sources)
 
-## Локальный preview
+## Local preview
 
-Команды запуска (важно: перед `start/build` автоматически выполняется `sync`):
+Start commands (note: `sync` runs automatically before `start/build`):
 
 ```bash
 npm run start
 ```
 
-Сборка статики:
+Build static files:
 
 ```bash
 npm run build
 ```
 
-## Откуда берётся контент
+## Where content comes from
 
-Скрипт `npm run sync` копирует в этот проект:
+The `npm run sync` script copies into this project:
 
-- `openapi-built/openapi.yaml` + `openapi-built/components/schemas/*`
+- bundled OpenAPI contract: `web/openapi.bundled.yaml` (published as `/openapi/openapi.yaml`)
+- schemas: `openapi-built/components/schemas/*`
 - `docs/reference/cop.md`
 - Postman collection JSON
-- Markdown сценарии интеграции
+- Integration scenarios (Markdown)
 
-Пути можно переопределить через env vars: `OPENAPI_BUILT_DIR`, `COP_MD`, `POSTMAN_COLLECTION`, `INTEGRATION_DOCS_DIR`.
+Paths can be overridden via env vars: `OPENAPI_SPEC_FILE`, `OPENAPI_SCHEMAS_DIR`, `COP_MD`, `POSTMAN_COLLECTION`, `INTEGRATION_DOCS_DIR`.

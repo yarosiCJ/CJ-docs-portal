@@ -53,19 +53,11 @@ async function copyDirIfExists(src, dst) {
 const SOURCES_ROOT = path.resolve(getEnv("SOURCES_ROOT", "/Users/yarosi/Documents/Python"));
 
 const OPENAPI_SPEC_FILE_RAW = getEnv("OPENAPI_SPEC_FILE", "");
-const OPENAPI_SPEC_FALLBACK = path.resolve(
-  getEnv(
-    "OPENAPI_SPEC_FALLBACK",
-    path.join(SOURCES_ROOT, "ApiRefactoring", "openapi-built", "openapi.yaml"),
-  ),
-);
-
 const OPENAPI_SPEC_FILE =
   OPENAPI_SPEC_FILE_RAW.trim() !== ""
     ? path.resolve(OPENAPI_SPEC_FILE_RAW)
     : await firstExistingFile([
         path.join(SOURCES_ROOT, "ApiRefactoring", "web", "openapi.bundled.yaml"),
-        OPENAPI_SPEC_FALLBACK,
       ]);
 const OPENAPI_SCHEMAS_DIR = path.resolve(
   getEnv(
@@ -76,12 +68,15 @@ const OPENAPI_SCHEMAS_DIR = path.resolve(
 const COP_MD = path.resolve(
   getEnv("COP_MD", path.join(SOURCES_ROOT, "ApiRefactoring", "docs", "reference", "cop.md")),
 );
-const POSTMAN_COLLECTION = path.resolve(
-  getEnv(
-    "POSTMAN_COLLECTION",
-    path.join(SOURCES_ROOT, "Postman_CJ_sand", "Clear_Junction_API.postman_collection.json"),
-  ),
-);
+const POSTMAN_COLLECTION_RAW = getEnv("POSTMAN_COLLECTION", "");
+const POSTMAN_COLLECTION =
+  POSTMAN_COLLECTION_RAW.trim() !== ""
+    ? path.resolve(POSTMAN_COLLECTION_RAW)
+    : await firstExistingFile([
+        path.join(SOURCES_ROOT, "Postman_CJ_sand", "Clear_Junction_API.postman_collection.json"),
+        path.join(portalRoot, "..", "sources", "collection", "Clear_Junction_API.postman_collection.json"),
+        path.join(portalRoot, "sources", "collection", "Clear_Junction_API.postman_collection.json"),
+      ]);
 const INTEGRATION_DOCS_DIR = path.resolve(
   getEnv("INTEGRATION_DOCS_DIR", path.join(SOURCES_ROOT, "Integration_scenarious", "docs")),
 );
@@ -109,11 +104,15 @@ await fs.mkdir(dstReferenceDir, { recursive: true });
 if (OPENAPI_SPEC_FILE) {
   await copyFileIfExists(OPENAPI_SPEC_FILE, path.join(dstOpenApiDir, "openapi.yaml"));
 } else {
-  console.warn("[sync] missing OpenAPI spec file (no candidates found)");
+  console.warn("[sync] missing OpenAPI bundled spec file (no candidates found)");
 }
 await copyDirIfExists(OPENAPI_SCHEMAS_DIR, dstSchemasDir);
 
-await copyFileIfExists(POSTMAN_COLLECTION, path.join(dstPostmanDir, "Clear_Junction_API.postman_collection.json"));
+if (POSTMAN_COLLECTION) {
+  await copyFileIfExists(POSTMAN_COLLECTION, path.join(dstPostmanDir, "Clear_Junction_API.postman_collection.json"));
+} else {
+  console.warn("[sync] missing Postman collection file (no candidates found)");
+}
 await copyFileIfExists(COP_MD, path.join(dstReferenceDir, "cop.md"));
 await copyDirIfExists(INTEGRATION_DOCS_DIR, dstIntegrationDir);
 
