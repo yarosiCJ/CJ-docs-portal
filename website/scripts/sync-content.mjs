@@ -189,9 +189,19 @@ await writeFile(
   JSON.stringify({ label: "Guides", position: 1 }, null, 2) + "\n",
 );
 await writeFile(
+  dstIntegrationGuidesDir,
+  "index.mdx",
+  `---\nsidebar_position: 1\n---\n\n# Integration guides\n\nNarrative documentation for integration flows, prerequisites, and troubleshooting.\n\nContent is synced from the integration scenarios repository (\`docs/**\`) excluding \`README.md\`.\n`,
+);
+await writeFile(
   dstIntegrationScenariosDir,
   "_category_.json",
   JSON.stringify({ label: "Scenarios", position: 2 }, null, 2) + "\n",
+);
+await writeFile(
+  dstIntegrationScenariosDir,
+  "index.mdx",
+  `---\nsidebar_position: 1\n---\n\n# Integration scenarios\n\nStep-by-step playbooks and scenario documents.\n\nContent is synced from the integration scenarios repository (\`scenarios/**\`) excluding \`README.md\`.\n`,
 );
 
 console.log("[sync] done");

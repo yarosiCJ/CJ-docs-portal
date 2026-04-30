@@ -6,25 +6,83 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  /* Clear Junction brand guidelines:
+     black/white foundation, restrained colour accents, Figtree typography. */
+  --ifm-font-family-base: 'Figtree', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  --ifm-heading-font-family: var(--ifm-font-family-base);
+
+  --ifm-color-primary: #111111;
+  --ifm-color-primary-dark: #000000;
+  --ifm-color-primary-darker: #000000;
+  --ifm-color-primary-darkest: #000000;
+  --ifm-color-primary-light: #2e2e2e;
+  --ifm-color-primary-lighter: #404040;
+  --ifm-color-primary-lightest: #4c4c4c;
+
+  --cj-bg: #fafafa;
+  --cj-text: #111111;
+  --cj-muted: rgba(17, 17, 17, 0.72);
+  --cj-surface: #ffffff;
+  --cj-border: rgba(17, 17, 17, 0.12);
+  --cj-accent: #62dcf7;
+  --cj-accent-soft: #ebf5fc;
+  --cj-canary: #dcf763;
+  --cj-heliotrope: #8266ff;
+  --cj-fuchsia: #f762dc;
+  --cj-salmon: #f77e62;
+  --cj-malachite: #62f77e;
+  --cj-shadow: 0 10px 24px rgba(17, 17, 17, 0.08);
+
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
+  --ifm-color-primary: #ffffff;
+  --ifm-color-primary-dark: #f5f5f5;
+  --ifm-color-primary-darker: #efefef;
+  --ifm-color-primary-darkest: #dadada;
+  --ifm-color-primary-light: #ffffff;
+  --ifm-color-primary-lighter: #ffffff;
+  --ifm-color-primary-lightest: #ffffff;
+
+  --cj-bg: #111111;
+  --cj-text: #fafafa;
+  --cj-muted: rgba(250, 250, 250, 0.72);
+  --cj-surface: #1d1d1d;
+  --cj-border: rgba(250, 250, 250, 0.12);
+  --cj-accent: #62dcf7;
+  --cj-accent-soft: rgba(98, 220, 247, 0.13);
+  --cj-canary: #dcf763;
+  --cj-heliotrope: #8266ff;
+  --cj-fuchsia: #f762dc;
+  --cj-salmon: #f77e62;
+  --cj-malachite: #62f77e;
+  --cj-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+html,
+body {
+  background: var(--cj-bg);
+  color: var(--cj-text);
+}
+
+.navbar {
+  box-shadow: none;
+  border-bottom: 1px solid var(--cj-border);
+}
+
+.navbar__logo {
+  height: 28px;
+}
+
+.navbar__logo img {
+  height: 28px;
+  width: auto;
+}
+
+.navbar__title {
+  display: none;
 }

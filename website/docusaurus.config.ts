@@ -7,7 +7,10 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'Clear Junction API',
   tagline: 'API reference + guides',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.svg',
+  stylesheets: [
+    'https://fonts.googleapis.com/css2?family=Figtree:wght@300..900&display=swap',
+  ],
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -65,13 +68,16 @@ const config: Config = {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
     colorMode: {
+      defaultMode: 'light',
+      disableSwitch: false,
       respectPrefersColorScheme: true,
     },
     navbar: {
       title: 'Clear Junction API',
       logo: {
         alt: 'Clear Junction API',
-        src: 'img/logo.svg',
+        src: 'img/logo-light.svg',
+        srcDark: 'img/logo-dark.svg',
       },
       items: [
         {
@@ -84,11 +90,6 @@ const config: Config = {
         {
           to: '/docs/postman',
           label: 'Postman',
-          position: 'right',
-        },
-        {
-          href: 'https://github.com/your-org/cj-docs-portal',
-          label: 'GitHub',
           position: 'right',
         },
       ],
@@ -115,15 +116,6 @@ const config: Config = {
             {
               label: 'Postman collection',
               to: '/docs/postman',
-            },
-          ],
-        },
-        {
-          title: 'More',
-          items: [
-            {
-              label: 'GitHub',
-              href: 'https://github.com/your-org/cj-docs-portal',
             },
           ],
         },
