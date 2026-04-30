@@ -76,9 +76,12 @@ jobs:
           echo "SOURCES_ROOT=${GITHUB_WORKSPACE}/sources" >> "$GITHUB_ENV"
           echo "OPENAPI_SPEC_FILE=${GITHUB_WORKSPACE}/sources/contract/web/openapi.bundled.yaml" >> "$GITHUB_ENV"
           echo "OPENAPI_SCHEMAS_DIR=${GITHUB_WORKSPACE}/sources/contract/openapi-built/components/schemas" >> "$GITHUB_ENV"
+          echo "OPENAPI_DIAGRAMS_DIR=${GITHUB_WORKSPACE}/sources/contract/docs/diagrams/out" >> "$GITHUB_ENV"
           echo "COP_MD=${GITHUB_WORKSPACE}/sources/contract/docs/reference/cop.md" >> "$GITHUB_ENV"
           echo "POSTMAN_COLLECTION=${GITHUB_WORKSPACE}/sources/collection/Clear_Junction_API.postman_collection.json" >> "$GITHUB_ENV"
+          echo "INTEGRATION_REPO_ROOT=${GITHUB_WORKSPACE}/sources/integration" >> "$GITHUB_ENV"
           echo "INTEGRATION_DOCS_DIR=${GITHUB_WORKSPACE}/sources/integration/docs" >> "$GITHUB_ENV"
+          echo "INTEGRATION_SCENARIOS_DIR=${GITHUB_WORKSPACE}/sources/integration/scenarios" >> "$GITHUB_ENV"
 
       - name: Build site
         working-directory: website

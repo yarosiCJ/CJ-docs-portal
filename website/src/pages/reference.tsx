@@ -3,12 +3,12 @@ import Layout from "@theme/Layout";
 import BrowserOnly from "@docusaurus/BrowserOnly";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
-export default function Reference(): JSX.Element {
+export default function Reference(): React.ReactElement {
   const specUrl = useBaseUrl("/openapi/openapi.yaml");
 
   return (
-    <Layout title="API Reference">
-      <div style={{ height: "calc(100vh - 60px)" }}>
+    <Layout title="API Reference" noFooter>
+      <div style={{ height: "calc(100vh - var(--ifm-navbar-height))", overflow: "auto" }}>
         <BrowserOnly fallback={<div style={{ padding: 16 }}>Loading API reference…</div>}>
           {() => {
             // redoc expects browser globals; don't SSR it
@@ -19,6 +19,7 @@ export default function Reference(): JSX.Element {
                 specUrl={specUrl}
                 options={{
                   scrollYOffset: 60,
+                  requiredPropsFirst: true,
                 }}
               />
             );
