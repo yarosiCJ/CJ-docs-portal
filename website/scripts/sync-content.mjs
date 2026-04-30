@@ -152,9 +152,13 @@ if (OPENAPI_SPEC_FILE) {
   const dstOpenApiSpec = path.join(dstOpenApiDir, "openapi.yaml");
   await copyFileIfExists(OPENAPI_SPEC_FILE, dstOpenApiSpec);
 
-  // Docusaurus docs are routed without file extensions (e.g. /docs/reference/cop),
-  // so patch contract markdown links that mistakenly point to .md source files.
-  await patchTextFileIfExists(dstOpenApiSpec, (s) => s.replaceAll("../docs/reference/cop.md", "../docs/reference/cop"));
+  // Redoc renders contract markdown links relative to the /reference page, not to
+  // the OpenAPI file. Keep those links within the Docusaurus baseUrl path.
+  await patchTextFileIfExists(dstOpenApiSpec, (s) =>
+    s
+      .replaceAll("../docs/reference/cop.md", "docs/reference/cop")
+      .replaceAll("../docs/diagrams/out/", "docs/diagrams/out/"),
+  );
 } else {
   console.warn("[sync] missing OpenAPI bundled spec file (no candidates found)");
 }
