@@ -92,6 +92,7 @@
   --cj-redoc-purple: #6852cc;
   --cj-redoc-required: #de7158;
   --cj-redoc-required-text: #de7158;
+  --cj-redoc-schema-type: #4c4c4c;
   --cj-redoc-method-get: #62dcf7;
   --cj-redoc-method-post: #3ba0b7;
   --cj-redoc-method-put: #898b1c;
@@ -140,6 +141,7 @@
   --cj-redoc-purple: #8e75ff;
   --cj-redoc-required: var(--cj-salmon);
   --cj-redoc-required-text: var(--cj-salmon);
+  --cj-redoc-schema-type: #dadada;
   --cj-redoc-method-get: var(--cj-accent);
   --cj-redoc-method-post: var( --cj-sec-cerulean-dark);
   --cj-redoc-method-put: var(--cj-canary);
@@ -236,6 +238,34 @@ body {
 .redocPage .redoc-schema-constraint {
   font-size: 14px !important;
   line-height: 1.1 !important;
+}
+
+
+
+.redocPage.redoc-schema-overrides td[kind='field'],
+.redocPage.redoc-schema-overrides td[kind='field'] .property-name,
+.redocPage.redoc-schema-overrides td[kind='field'] button {
+  font-family: var(--ifm-font-family-base) !important;
+  font-size: 15px !important;
+  line-height: 1.5 !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+}
+
+.redocPage.redoc-schema-overrides td[kind='field'] button {
+  font: inherit !important;
+  color: inherit !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.redocPage.redoc-schema-overrides td:not([kind='field']) .sc-kZGvTq,
+.redocPage.redoc-schema-overrides td:not([kind='field']) .sc-iMfspz,
+.redocPage.redoc-schema-overrides td:not([kind='field']) .sc-ejdXBF,
+.redocPage.redoc-schema-overrides td:not([kind='field']) [class*='SchemaType'],
+.redocPage.redoc-schema-overrides td:not([kind='field']) [class*='schemaType'] {
+  color: var(--cj-redoc-schema-type) !important;
 }
 
 .redocPage .api-info a {
@@ -337,10 +367,16 @@ body {
 .redocPage .token.inserted {
   color: var(--cj-redoc-string) !important;
   /* Override Redoc's internal upscaling for string tokens */
-  font-size: 1.85em !important;
+  font-size: 0.85em !important;
 }
 
 .redocPage .redoc-json .property.token.string {
+  color: var(--cj-text) !important;
+  /* Override Redoc's internal upscaling for JSON keys */
+  font-size: 0.85em !important;
+}
+
+.redocPage .redoc-json .token.number {
   color: var(--cj-text) !important;
   /* Override Redoc's internal upscaling for JSON keys */
   font-size: 0.85em !important;
@@ -448,12 +484,25 @@ body {
 
 .redocPage .operation-type,
 .redocPage .http-verb {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  min-width: 40px !important;
+  height: 16px !important;
+  box-sizing: border-box !important;
   border: 1px solid transparent !important;
   border-radius: 4px !important;
+  overflow: hidden !important;
+  padding: 0 6px !important;
+  font-size: 10px !important;
   font-weight: 700 !important;
+  line-height: 16px !important;
   letter-spacing: 0 !important;
-  padding: 2px 6px !important;
+  text-align: center !important;
   text-transform: uppercase !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
 }
 
 .redocPage .operation-type.get,

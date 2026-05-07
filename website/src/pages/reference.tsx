@@ -36,6 +36,7 @@ export default function Reference(): React.ReactElement {
 function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement {
   const { colorMode } = useColorMode();
   const isDark = colorMode === "dark";
+  const diagramsBaseUrl = useBaseUrl("/docs/diagrams/out/");
   const [useSchemaOverrides, setUseSchemaOverrides] = useState<boolean>(() =>
     shouldUseSchemaOverridesFromLocation(),
   );
@@ -108,12 +109,14 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
 
       root.querySelectorAll<HTMLImageElement>("img[src*='/docs/diagrams/out/'], img[src*='docs/diagrams/out/']").forEach((img) => {
         const currentSrc = img.getAttribute("src") ?? "";
-        const baseSrc =
-          img.dataset.diagramBaseSrc ??
-          currentSrc.replace(/-(dark|light)(\.svg(?:[?#].*)?)$/i, "$2");
+        const diagramMatch = currentSrc.match(/(?:^|\/)docs\/diagrams\/out\/([^/?#]+?)(?:-(?:dark|light))?\.svg([?#].*)?$/i);
+        if (!diagramMatch) return;
 
-        img.dataset.diagramBaseSrc = baseSrc;
-        img.src = baseSrc.replace(/\.svg([?#].*)?$/i, `${isDark ? "-dark" : "-light"}.svg$1`);
+        const [, diagramName, suffix = ""] = diagramMatch;
+        const nextSrc = `${diagramsBaseUrl}${diagramName}-${isDark ? "dark" : "light"}.svg${suffix}`;
+        if (img.getAttribute("src") !== nextSrc) {
+          img.src = nextSrc;
+        }
       });
     };
 
@@ -122,7 +125,7 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
     observer.observe(root, { childList: true, subtree: true });
 
     return () => observer.disconnect();
-  }, [isDark]);
+  }, [diagramsBaseUrl, isDark]);
 
   return (
     <div
@@ -144,6 +147,7 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
               options={{
                 scrollYOffset: 60,
                 requiredPropsFirst: true,
+                hideSchemaTitles: true,
                 theme: {
                   colors: {
                     primary: {
