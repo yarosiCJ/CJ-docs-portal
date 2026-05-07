@@ -1,13 +1,61 @@
-/**
+/* *
  * Any CSS included here will be global. The classic template
  * bundles Infima by default. Infima is a CSS framework designed to
  * work well for content-centric websites.
  */
 
 /* You can override the default Infima variables here. */
+
 :root {
   /* Clear Junction brand guidelines:
      black/white foundation, restrained colour accents, Figtree typography. */
+
+  /* ── Clear Junction corporate palette (named) ─────────────────────────── */
+  /* Core */
+  --cj-core-black: #000000; /* Black */
+  --cj-core-white: #ffffff; /* White */
+
+  /* Greys */
+  --cj-grey-111: #111111; /* Near Black / Black */
+  --cj-grey-161: #161616; /* Charcoal 950 / Dark Grey 5 */
+  --cj-grey-1d1: #1d1d1d; /* Charcoal 900 / Dark Grey 4 */
+  --cj-grey-2e2: #2e2e2e; /* Charcoal 800 / Dark Grey 3 */
+  --cj-grey-333: #333333; /* Dark Grey */
+  --cj-grey-404: #404040; /* Grey 700 / Dark Grey 2 */
+  --cj-grey-4c4: #4c4c4c; /* Grey 650 / Dark Grey 1 */
+  --cj-grey-707: #707070; /* Grey 500 / Mid Grey 2 */
+  --cj-grey-888: #888888; /* Grey 400 / Mid Grey 1 */
+  --cj-grey-dad: #dadada; /* Grey 200 / Light Grey 5 */
+  --cj-grey-e3e: #e3e3e3; /* Grey 150 / Light Grey 4 */
+  --cj-grey-efe: #efefef; /* Grey 100 / Light Grey 3 */
+  --cj-grey-f2f: #f2f2f2; /* Grey 75 */
+  --cj-grey-f5f: #f5f5f5; /* Grey 50 / Light Grey 2 */
+  --cj-grey-faf: #fafafa; /* Off White / Light Grey 1 */
+
+  /* Secondary palette + tints */
+  --cj-sec-cerulean: #62dcf7; /* Cyan / Cerulean */
+  --cj-sec-cerulean-light: #81e3f9; /* Cyan Light / Cerulean Light */
+  --cj-sec-cerulean-dark: #3ba0b7; /* Cyan Dark / Cerulean Dark */
+  --cj-sec-blue: #239de7; /* Blue */
+  --cj-sec-blue-light: #d8e9f8; /* Blue Light */
+  --cj-sec-blue-mid: #b2d4f2; /* Blue Mid */
+  --cj-sec-blue-tint: #ebf5fc; /* Blue Tint */
+  --cj-sec-canary: #dcf763; /* Lime / Canary */
+  --cj-sec-canary-light: #dff873; /* Lime Light / Canary Light */
+  --cj-sec-canary-dark: #b0c64f; /* Lime Dark / Canary Dark */
+  --cj-sec-malachite: #62f77e; /* Green / Malachite */
+  --cj-sec-malachite-light: #81f998; /* Green Light / Malachite Light */
+  --cj-sec-malachite-dark: #22ab3b; /* Green Dark / Malachite Dark */
+  --cj-sec-salmon: #f77e62; /* Coral / Salmon */
+  --cj-sec-salmon-light: #f88b72; /* Coral Light / Salmon Light */
+  --cj-sec-salmon-dark: #de7158; /* Coral Dark / Salmon Dark */
+  --cj-sec-fuchsia: #f762dc; /* Pink / Fuchsia */
+  --cj-sec-fuchsia-light: #f872df; /* Pink Light / Fuchsia Light */
+  --cj-sec-fuchsia-dark: #c64eb0; /* Pink Dark / Fuchsia Dark */
+  --cj-sec-heliotrope: #8266ff; /* Purple / Heliotrope */
+  --cj-sec-heliotrope-light: #8e75ff; /* Purple Light / Heliotrope Light */
+  --cj-sec-heliotrope-dark: #6852cc; /* Purple Dark / Heliotrope Dark */
+  --cj-sec-olive: #898b1c; /* Olive */
   --ifm-font-family-base: 'Figtree', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   --ifm-heading-font-family: var(--ifm-font-family-base);
 
@@ -32,6 +80,26 @@
   --cj-salmon: #f77e62;
   --cj-malachite: #62f77e;
   --cj-shadow: 0 10px 24px rgba(17, 17, 17, 0.08);
+  --cj-redoc-link: #3ba0b7;
+  --cj-redoc-success: #62f77e;
+  --cj-redoc-success-text: #111111;
+  /* Redoc syntax highlighting: strings/inserted (separate from status success) */
+  --cj-redoc-string: #22ab3b;
+  /* Redoc syntax highlighting: numbers (separate from links/status) */
+  --cj-redoc-number: var(--cj-sec-blue);
+  --cj-redoc-error: #f88b72;
+  --cj-redoc-error-text: #111111;
+  --cj-redoc-purple: #6852cc;
+  --cj-redoc-required: #de7158;
+  --cj-redoc-required-text: #de7158;
+  --cj-redoc-method-get: #62dcf7;
+  --cj-redoc-method-post: #3ba0b7;
+  --cj-redoc-method-put: #898b1c;
+  --cj-redoc-method-delete: #de7158;
+  --cj-redoc-method-get-text: #111111;
+  --cj-redoc-method-post-text: #ffffff;
+  --cj-redoc-method-put-text: #111111;
+  --cj-redoc-method-delete-text: #111111;
 
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
@@ -60,6 +128,26 @@
   --cj-salmon: #f77e62;
   --cj-malachite: #62f77e;
   --cj-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  --cj-redoc-link: var(--cj-accent);
+  --cj-redoc-success: #81f998;
+  --cj-redoc-success-text: #111111;
+  /* Redoc syntax highlighting: strings/inserted (separate from status success) */
+  --cj-redoc-string: var(--cj-redoc-success);
+  /* Redoc syntax highlighting: numbers (separate from links/status) */
+  --cj-redoc-number: var(--cj-redoc-link);
+  --cj-redoc-error: var(--cj-salmon);
+  --cj-redoc-error-text: #111111;
+  --cj-redoc-purple: #8e75ff;
+  --cj-redoc-required: var(--cj-salmon);
+  --cj-redoc-required-text: var(--cj-salmon);
+  --cj-redoc-method-get: var(--cj-accent);
+  --cj-redoc-method-post: var( --cj-sec-cerulean-dark);
+  --cj-redoc-method-put: var(--cj-canary);
+  --cj-redoc-method-delete: var(--cj-salmon);
+  --cj-redoc-method-get-text: #111111;
+  --cj-redoc-method-post-text: #111111;
+  --cj-redoc-method-put-text: #111111;
+  --cj-redoc-method-delete-text: #111111;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
@@ -88,23 +176,99 @@ body {
 }
 
 .redocPage {
-  font-size: 15px;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.redocPage .menu-content {
+  border-right: 1px solid var(--cj-border) !important;
+}
+
+.redocPage .api-info h1,
+.redocPage .api-info h2,
+.redocPage .api-info h3 {
+  letter-spacing: 0 !important;
+}
+
+.redocPage h1,
+.redocPage h2,
+.redocPage h3,
+.redocPage h4,
+.redocPage h5,
+.redocPage h6 {
+  color: var(--cj-text) !important;
+  font-family: var(--ifm-heading-font-family) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.1 !important;
+}
+
+.redocPage h1 {
+  font-size: 40px !important;
+}
+
+.redocPage h2 {
+  font-size: 28px !important;
+}
+
+.redocPage h3 {
+  font-size: 22px !important;
+}
+
+.redocPage h4 {
+  font-size: 18px !important;
+}
+
+.redocPage p,
+.redocPage li,
+.redocPage td,
+.redocPage th {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.redocPage small,
+.redocPage label,
+.redocPage .operation-type,
+.redocPage .http-verb,
+.redocPage [class*='required' i],
+.redocPage .redoc-schema-constraint {
+  font-size: 14px !important;
+  line-height: 1.1 !important;
+}
+
+.redocPage .api-info a {
+  color: var(--cj-redoc-link) !important;
+  text-decoration-color: var(--cj-accent) !important;
+  text-underline-offset: 3px;
 }
 
 .redocPage table,
 .redocPage td,
 .redocPage th {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .redocPage code,
 .redocPage pre {
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 1.5 !important;
 }
 
 .redocPage .redoc-json,
 .redocPage .redoc-json code {
-  font-size: 12px;
+  font-size: 11px;
+  line-height: 1.5 !important;
+}
+
+/* Redoc right panel (Request/Response samples): slightly smaller JSON for density */
+.redocPage .react-tabs__tab-panel .redoc-json,
+.redocPage .react-tabs__tab-panel .redoc-json code,
+.redocPage .react-tabs__tab-panel pre,
+.redocPage .react-tabs__tab-panel code {
+  font-size: 9px !important;
+  line-height: 1.15 !important;
 }
 
 .redocPage pre,
@@ -115,9 +279,9 @@ body {
 }
 
 .redocPage pre {
-  background: #ffffff !important;
-  color: #111111 !important;
-  border: 1px solid rgba(17, 17, 17, 0.14) !important;
+  background: var(--cj-surface) !important;
+  color: var(--cj-text) !important;
+  border: 1px solid var(--cj-border) !important;
 }
 
 .redocPage a,
@@ -125,7 +289,7 @@ body {
 .redocPage [class*='copy'],
 .redocPage [class*='Expand'],
 .redocPage [class*='Collapse'] {
-  color: #111111 !important;
+  color: var(--cj-text) !important;
 }
 
 [data-theme='dark'] .redocPage,
@@ -143,7 +307,7 @@ body {
 [data-theme='dark'] .redocPage td,
 [data-theme='dark'] .redocPage th {
   background: #161616 !important;
-  border-color: rgba(250, 250, 250, 0.18) !important;
+  border-color: var(--cj-border) !important;
 }
 
 [data-theme='dark'] .redocPage code,
@@ -151,8 +315,8 @@ body {
 [data-theme='dark'] .redocPage textarea,
 [data-theme='dark'] .redocPage input {
   background: #2e2e2e !important;
-  color: #fafafa !important;
-  border-color: rgba(250, 250, 250, 0.22) !important;
+  color: var(--cj-text) !important;
+  border-color: var(--cj-border) !important;
 }
 
 [data-theme='dark'] .redocPage code {
@@ -164,56 +328,60 @@ body {
 .redocPage .token.constant,
 .redocPage .token.symbol,
 .redocPage .token.deleted {
-  color: #1d1d1d !important;
+  color: var(--cj-text) !important;
 }
 
 .redocPage .token.string,
 .redocPage .token.char,
 .redocPage .token.builtin,
 .redocPage .token.inserted {
-  color: #22ab3b !important;
+  color: var(--cj-redoc-string) !important;
+  /* Override Redoc's internal upscaling for string tokens */
+  font-size: 1.85em !important;
 }
 
 .redocPage .redoc-json .property.token.string {
-  color: #1d1d1d !important;
+  color: var(--cj-text) !important;
+  /* Override Redoc's internal upscaling for JSON keys */
+  font-size: 0.85em !important;
 }
 
 .redocPage .token.string.json-key {
-  color: #1d1d1d !important;
+  color: var(--cj-text) !important;
 }
 
 .redocPage .token.number {
-  color: #239de7 !important;
+  color: var(--cj-redoc-number) !important;
 }
 
 .redocPage .token.boolean,
 .redocPage .token.null,
 .redocPage .token.keyword {
-  color: #6852cc !important;
+  color: var(--cj-redoc-purple) !important;
 }
 
 .redocPage .token.url {
-  color: #1f6581 !important;
+  color: var(--cj-redoc-link) !important;
 }
 
 .redocPage .token.string.json-url-value {
-  color: #1f6581 !important;
+  color: var(--cj-redoc-link) !important;
 }
 
 .redocPage .token.string.json-url-value * {
-  color: #1f6581 !important;
+  color: var(--cj-redoc-link) !important;
 }
 
 .redocPage .token.punctuation,
 .redocPage .token.operator {
-  color: #4c4c4c !important;
+  color: var(--cj-muted) !important;
 }
 
 .redocPage .token.comment,
 .redocPage .token.prolog,
 .redocPage .token.doctype,
 .redocPage .token.cdata {
-  color: #707070 !important;
+  color: var(--cj-muted) !important;
 }
 
 [data-theme='dark'] .redocPage .token.property,
@@ -228,11 +396,15 @@ body {
 [data-theme='dark'] .redocPage .token.char,
 [data-theme='dark'] .redocPage .token.builtin,
 [data-theme='dark'] .redocPage .token.inserted {
-  color: #81f998 !important;
+  color: var(--cj-redoc-string) !important;
+  /* Override Redoc's internal upscaling for string tokens */
+  font-size: 0.85em !important;
 }
 
 [data-theme='dark'] .redocPage .redoc-json .property.token.string {
   color: #fafafa !important;
+  /* Override Redoc's internal upscaling for JSON keys */
+  font-size: 0.85em !important;
 }
 
 [data-theme='dark'] .redocPage .token.string.json-key {
@@ -241,33 +413,73 @@ body {
 
 [data-theme='dark'] .redocPage .token.number,
 [data-theme='dark'] .redocPage .token.url {
-  color: #62dcf7 !important;
+  color: var(--cj-redoc-link) !important;
+}
+
+[data-theme='dark'] .redocPage .token.number {
+  color: var(--cj-redoc-number) !important;
 }
 
 [data-theme='dark'] .redocPage .token.string.json-url-value {
-  color: #62dcf7 !important;
+  color: var(--cj-redoc-link) !important;
 }
 
 [data-theme='dark'] .redocPage .token.string.json-url-value * {
-  color: #62dcf7 !important;
+  color: var(--cj-redoc-link) !important;
 }
 
 [data-theme='dark'] .redocPage .token.boolean,
 [data-theme='dark'] .redocPage .token.null,
 [data-theme='dark'] .redocPage .token.keyword {
-  color: #8e75ff !important;
+  color: var(--cj-redoc-purple) !important;
 }
 
 [data-theme='dark'] .redocPage .token.punctuation,
 [data-theme='dark'] .redocPage .token.operator {
-  color: #dadada !important;
+  color: var(--cj-muted) !important;
 }
 
 [data-theme='dark'] .redocPage .token.comment,
 [data-theme='dark'] .redocPage .token.prolog,
 [data-theme='dark'] .redocPage .token.doctype,
 [data-theme='dark'] .redocPage .token.cdata {
-  color: #888888 !important;
+  color: var(--cj-muted) !important;
+}
+
+.redocPage .operation-type,
+.redocPage .http-verb {
+  border: 1px solid transparent !important;
+  border-radius: 4px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  padding: 2px 6px !important;
+  text-transform: uppercase !important;
+}
+
+.redocPage .operation-type.get,
+.redocPage .http-verb.get {
+  background: var(--cj-redoc-method-get) !important;
+  color: var(--cj-redoc-method-get-text) !important;
+}
+
+.redocPage .operation-type.post,
+.redocPage .http-verb.post {
+  background: var(--cj-redoc-method-post) !important;
+  color: var(--cj-redoc-method-post-text) !important;
+}
+
+.redocPage .operation-type.put,
+.redocPage .http-verb.put,
+.redocPage .operation-type.patch,
+.redocPage .http-verb.patch {
+  background: var(--cj-redoc-method-put) !important;
+  color: var(--cj-redoc-method-put-text) !important;
+}
+
+.redocPage .operation-type.delete,
+.redocPage .http-verb.delete {
+  background: var(--cj-redoc-method-delete) !important;
+  color: var(--cj-redoc-method-delete-text) !important;
 }
 
 [data-theme='dark'] .redocPage h1,
@@ -280,130 +492,216 @@ body {
   color: #fafafa !important;
 }
 
-[data-theme='dark'] .redocPage [class*='enum'],
-[data-theme='dark'] .redocPage [class*='Enum'] {
+[data-theme='dark'] .redocPage.redoc-schema-overrides [class*='enum'],
+[data-theme='dark'] .redocPage.redoc-schema-overrides [class*='Enum'] {
   background: #161616 !important;
   color: #fafafa !important;
 }
 
-.redocPage [class*='required' i] {
-  color: #c64eb0 !important;
+/* .redocPage [class*='required' i] { */
+ /* background: var(--cj-redoc-required) !important; */
+ /* border-radius: 4px !important; */
+ /* color: var(--cj-redoc-error-text) !important; */
+ /* text-transform: uppercase; */
+ /* letter-spacing: 0.05em; */
+ /* text-decoration-color: var(--cj-redoc-method-delete) !important; */
+ /* display: inline-block; */
+ /* font-weight: 700 !important; */
+ /* padding: 2px 10px !important; */
+/* } */
+
+[data-theme='dark'] .redocPage.redoc-schema-overrides [class*='required' i] {
+  color: var(--cj-redoc-required-text) !important;
 }
 
-[data-theme='dark'] .redocPage [class*='required' i] {
-  color: #f77e62 !important;
+.redocPage.redoc-schema-overrides .redoc-schema-constraint {
+  color: var(--cj-redoc-link) !important;
 }
 
-.redocPage .redoc-schema-constraint {
-  color: #1f6581 !important;
-}
-
-[data-theme='dark'] .redocPage .redoc-schema-constraint {
-  color: #62dcf7 !important;
+[data-theme='dark'] .redocPage.redoc-schema-overrides .redoc-schema-constraint {
+  color: var(--cj-redoc-link) !important;
 }
 
 .redocPage a[href^='http'] {
-  color: #1f6581 !important;
+  color: var(--cj-redoc-link) !important;
 }
 
 [data-theme='dark'] .redocPage a[href^='http'] {
-  color: #62dcf7 !important;
+  color: var(--cj-redoc-link) !important;
 }
 
 .redocPage .redoc-status-success,
 .redocPage .redoc-status-success * {
-  color: #1f8a3b !important;
+  color: var(--cj-sec-malachite-dark) !important;
 }
 
 .redocPage .redoc-status-error,
 .redocPage .redoc-status-error * {
-  color: #c83f31 !important;
+  color: var(--cj-sec-salmon) !important;
 }
 
 [data-theme='dark'] .redocPage .redoc-status-success,
 [data-theme='dark'] .redocPage .redoc-status-success * {
-  color: #81f998 !important;
+  color: var(--cj-sec-malachite-light) !important;
 }
 
 [data-theme='dark'] .redocPage .redoc-status-error,
 [data-theme='dark'] .redocPage .redoc-status-error * {
-  color: #f77e62 !important;
+  color: var(--cj-sec-salmon) !important;
+}
+
+.redocPage .redoc-status-success,
+.redocPage .redoc-status-error {
+  border-radius: 4px !important;
+  display: inline-block;
+  font-weight: 700 !important;
+  padding: 2px 6px !important;
+}
+
+.redocPage .redoc-status-success {
+  background: var(--cj-grey-efe) !important;
+}
+
+.redocPage .redoc-status-error {
+  /* 2 steps darker vs success bg: EFEFEF -> E3E3E3 -> DADADA */
+  background: var(--cj-grey-dad) !important;
+}
+
+[data-theme='dark'] .redocPage .redoc-status-success {
+  background: var(--cj-grey-2e2) !important;
+}
+
+[data-theme='dark'] .redocPage .redoc-status-error {
+  /* 2 steps darker vs success bg: 2E2E2E -> 404040 -> 4C4C4C */
+  background: var(--cj-grey-4c4) !important;
 }
 
 .redocPage [role='tab'][aria-selected='true'],
 .redocPage [role='tab'][aria-pressed='true'] {
-  background: #111111 !important;
-  border-color: #111111 !important;
-  color: #ffffff !important;
+  background: var(--cj-text) !important;
+  border-color: var(--cj-text) !important;
+  color: var(--cj-bg) !important;
 }
 
 .redocPage [role='tab'][aria-selected='true'] *,
 .redocPage [role='tab'][aria-pressed='true'] * {
-  color: #ffffff !important;
+  color: var(--cj-bg) !important;
   fill: currentColor !important;
   stroke: currentColor !important;
 }
 
 .redocPage [role='tab'][aria-selected='false'],
 .redocPage [role='tab'][aria-pressed='false'] {
-  background: #ffffff !important;
-  color: #111111 !important;
-  border-color: rgba(17, 17, 17, 0.18) !important;
+  background: var(--cj-surface) !important;
+  color: var(--cj-text) !important;
+  border-color: var(--cj-border) !important;
 }
 
 .redocPage [role='tab'][aria-selected='false'] *,
 .redocPage [role='tab'][aria-pressed='false'] * {
-  color: #111111 !important;
+  color: var(--cj-text) !important;
   fill: currentColor !important;
   stroke: currentColor !important;
 }
 
 [data-theme='dark'] .redocPage [role='tab'][aria-selected='true'],
 [data-theme='dark'] .redocPage [role='tab'][aria-pressed='true'] {
-  background: #fafafa !important;
-  border-color: #fafafa !important;
-  color: #111111 !important;
+  background: var(--cj-text) !important;
+  border-color: var(--cj-text) !important;
+  color: var(--cj-bg) !important;
 }
 
 [data-theme='dark'] .redocPage [role='tab'][aria-selected='true'] *,
 [data-theme='dark'] .redocPage [role='tab'][aria-pressed='true'] * {
-  color: #111111 !important;
+  color: var(--cj-bg) !important;
   fill: currentColor !important;
   stroke: currentColor !important;
 }
 
 [data-theme='dark'] .redocPage [role='tab'][aria-selected='false'],
 [data-theme='dark'] .redocPage [role='tab'][aria-pressed='false'] {
-  background: #1d1d1d !important;
-  color: #fafafa !important;
-  border-color: rgba(250, 250, 250, 0.18) !important;
+  background: var(--cj-surface) !important;
+  color: var(--cj-text) !important;
+  border-color: var(--cj-border) !important;
 }
 
 [data-theme='dark'] .redocPage [role='tab'][aria-selected='false'] *,
 [data-theme='dark'] .redocPage [role='tab'][aria-pressed='false'] * {
-  color: #fafafa !important;
+  color: var(--cj-text) !important;
   fill: currentColor !important;
   stroke: currentColor !important;
 }
 
 .redocPage [role='tab'].redoc-status-success,
 .redocPage [role='tab'].redoc-status-success * {
-  color: #1f8a3b !important;
+  color: var(--cj-text) !important;
 }
 
 .redocPage [role='tab'].redoc-status-error,
 .redocPage [role='tab'].redoc-status-error * {
-  color: #c83f31 !important;
+  color: var(--cj-text) !important;
 }
 
 [data-theme='dark'] .redocPage [role='tab'].redoc-status-success,
 [data-theme='dark'] .redocPage [role='tab'].redoc-status-success * {
-  color: #81f998 !important;
+  color: var(--cj-text) !important;
 }
 
 [data-theme='dark'] .redocPage [role='tab'].redoc-status-error,
 [data-theme='dark'] .redocPage [role='tab'].redoc-status-error * {
-  color: #f77e62 !important;
+  color: var(--cj-text) !important;
+}
+
+.redocPage [role='tab'].redoc-status-success {
+  box-shadow: inset 3px 0 0 var(--cj-redoc-success);
+}
+
+.redocPage [role='tab'].redoc-status-error {
+  box-shadow: inset 3px 0 0 var(--cj-redoc-error);
+}
+
+.redocPage [role='tab'][aria-selected='true'].redoc-status-success,
+.redocPage [role='tab'][aria-selected='true'].redoc-status-success *,
+.redocPage [role='tab'][aria-selected='true'].redoc-status-error,
+.redocPage [role='tab'][aria-selected='true'].redoc-status-error * {
+  color: var(--cj-bg) !important;
+}
+
+/* Selected status tabs: match badge styling */
+.redocPage [role='tab'][aria-selected='true'].redoc-status-success {
+  background: var(--cj-grey-efe) !important;
+  border-color: var(--cj-grey-efe) !important;
+  color: var(--cj-sec-malachite-dark) !important;
+}
+.redocPage [role='tab'][aria-selected='true'].redoc-status-success * {
+  color: var(--cj-sec-malachite-dark) !important;
+}
+
+.redocPage [role='tab'][aria-selected='true'].redoc-status-error {
+  background: var(--cj-grey-dad) !important;
+  border-color: var(--cj-grey-dad) !important;
+  color: var(--cj-sec-salmon) !important;
+}
+.redocPage [role='tab'][aria-selected='true'].redoc-status-error * {
+  color: var(--cj-sec-salmon) !important;
+}
+
+[data-theme='dark'] .redocPage [role='tab'][aria-selected='true'].redoc-status-success {
+  background: var(--cj-grey-2e2) !important;
+  border-color: var(--cj-grey-2e2) !important;
+  color: var(--cj-sec-malachite-light) !important;
+}
+[data-theme='dark'] .redocPage [role='tab'][aria-selected='true'].redoc-status-success * {
+  color: var(--cj-sec-malachite-light) !important;
+}
+
+[data-theme='dark'] .redocPage [role='tab'][aria-selected='true'].redoc-status-error {
+  background: var(--cj-grey-4c4) !important;
+  border-color: var(--cj-grey-4c4) !important;
+  color: var(--cj-sec-salmon) !important;
+}
+[data-theme='dark'] .redocPage [role='tab'][aria-selected='true'].redoc-status-error * {
+  color: var(--cj-sec-salmon) !important;
 }
 
 [data-theme='dark'] .redocPage a,
@@ -411,11 +709,11 @@ body {
 [data-theme='dark'] .redocPage [class*='copy'],
 [data-theme='dark'] .redocPage [class*='Expand'],
 [data-theme='dark'] .redocPage [class*='Collapse'] {
-  color: #fafafa !important;
+  color: var(--cj-text) !important;
 }
 
 [data-theme='dark'] .redocPage .redoc-action-label {
-  color: #f5f5f5 !important;
+  color: var(--cj-text) !important;
 }
 
 .redocPage img[src$='.svg'],
@@ -426,9 +724,19 @@ body {
 
 [data-theme='dark'] .redocPage img[src$='.svg'],
 [data-theme='dark'] .redocPage img[src*='.svg?'] {
-  background: #fafafa;
-  border: 1px solid rgba(250, 250, 250, 0.18);
-  border-radius: 16px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
-  padding: 16px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Redoc: vendor wrapper (generated class) should use dark grey text */
+.redocPage .hJZZZS * {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  color: var(--cj-grey-4c4);
+}
+
+[data-theme='dark'] .redocPage .hJZZZS * {
+  color: inherit;
 }

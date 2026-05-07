@@ -1,8 +1,27 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Layout from "@theme/Layout";
 import BrowserOnly from "@docusaurus/BrowserOnly";
 import { useColorMode } from "@docusaurus/theme-common";
 import useBaseUrl from "@docusaurus/useBaseUrl";
+
+function shouldUseSchemaOverridesFromLocation(): boolean {
+  if (typeof window === "undefined") return true;
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const schemaFromSearch = searchParams.get("schema");
+  if (schemaFromSearch) return schemaFromSearch !== "base";
+
+  // Also support params placed after the hash, e.g. `#tag/foo?schema=base`
+  const hash = window.location.hash || "";
+  const qIndex = hash.indexOf("?");
+  if (qIndex !== -1) {
+    const hashParams = new URLSearchParams(hash.slice(qIndex + 1));
+    const schemaFromHash = hashParams.get("schema");
+    if (schemaFromHash) return schemaFromHash !== "base";
+  }
+
+  return true;
+}
 
 export default function Reference(): React.ReactElement {
   const specUrl = useBaseUrl("/openapi/openapi.yaml");
@@ -17,6 +36,37 @@ export default function Reference(): React.ReactElement {
 function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement {
   const { colorMode } = useColorMode();
   const isDark = colorMode === "dark";
+  const [useSchemaOverrides, setUseSchemaOverrides] = useState<boolean>(() =>
+    shouldUseSchemaOverridesFromLocation(),
+  );
+
+  useEffect(() => {
+    const update = () => setUseSchemaOverrides(shouldUseSchemaOverridesFromLocation());
+    update();
+    window.addEventListener("hashchange", update);
+    window.addEventListener("popstate", update);
+    return () => {
+      window.removeEventListener("hashchange", update);
+      window.removeEventListener("popstate", update);
+    };
+  }, []);
+
+  const redocPageClassName = useMemo(() => {
+    return `redocPage ${useSchemaOverrides ? "redoc-schema-overrides" : "redoc-schema-base"}`;
+  }, [useSchemaOverrides]);
+
+  const brand = {
+    bg: isDark ? "#111111" : "#fafafa",
+    surface: isDark ? "#1d1d1d" : "#ffffff",
+    surfaceAlt: isDark ? "#161616" : "#fafafa",
+    text: isDark ? "#fafafa" : "#111111",
+    muted: isDark ? "#dadada" : "#4c4c4c",
+    borderStrong: isDark ? "rgba(250, 250, 250, 0.25)" : "rgba(17, 17, 17, 0.2)",
+    borderSoft: isDark ? "rgba(250, 250, 250, 0.12)" : "rgba(17, 17, 17, 0.08)",
+    accent: "#62dcf7",
+    codeBg: isDark ? "#2e2e2e" : "#ffffff",
+    required: isDark ? "#f77e62" : "#c64eb0",
+  };
 
   useEffect(() => {
     const root = document.querySelector(".redocPage");
@@ -55,6 +105,16 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
         element.classList.toggle("redoc-status-success", /^2\d\d\b/.test(text) || className.includes("tab-success"));
         element.classList.toggle("redoc-status-error", /^[45]\d\d\b/.test(text) || className.includes("tab-error"));
       });
+
+      root.querySelectorAll<HTMLImageElement>("img[src*='/docs/diagrams/out/'], img[src*='docs/diagrams/out/']").forEach((img) => {
+        const currentSrc = img.getAttribute("src") ?? "";
+        const baseSrc =
+          img.dataset.diagramBaseSrc ??
+          currentSrc.replace(/-(dark|light)(\.svg(?:[?#].*)?)$/i, "$2");
+
+        img.dataset.diagramBaseSrc = baseSrc;
+        img.src = baseSrc.replace(/\.svg([?#].*)?$/i, `${isDark ? "-dark" : "-light"}.svg$1`);
+      });
     };
 
     markRedocDecorations();
@@ -62,15 +122,15 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
     observer.observe(root, { childList: true, subtree: true });
 
     return () => observer.disconnect();
-  }, []);
+  }, [isDark]);
 
   return (
     <div
-      className="redocPage"
+      className={redocPageClassName}
       style={{
         height: "calc(100vh - var(--ifm-navbar-height))",
         overflow: "auto",
-        background: isDark ? "#111111" : "#ffffff",
+        background: brand.bg,
       }}>
       <BrowserOnly fallback={<div style={{ padding: 16 }}>Loading API reference…</div>}>
         {() => {
@@ -79,6 +139,7 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
           const { RedocStandalone } = require("redoc");
           return (
             <RedocStandalone
+              key={useSchemaOverrides ? "schema-overrides" : "schema-base"}
               specUrl={specUrl}
               options={{
                 scrollYOffset: 60,
@@ -86,48 +147,60 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
                 theme: {
                   colors: {
                     primary: {
-                      main: isDark ? "#62dcf7" : "#111111",
+                      main: brand.accent,
                     },
                     text: {
-                      primary: isDark ? "#fafafa" : "#111111",
-                      secondary: isDark ? "#dadada" : "#4c4c4c",
+                      primary: brand.text,
+                      secondary: brand.muted,
                     },
                     border: {
-                      dark: isDark ? "rgba(250, 250, 250, 0.25)" : "rgba(17, 17, 17, 0.2)",
-                      light: isDark ? "rgba(250, 250, 250, 0.12)" : "rgba(17, 17, 17, 0.08)",
+                      dark: brand.borderStrong,
+                      light: brand.borderSoft,
                     },
                   },
                   sidebar: {
-                    backgroundColor: isDark ? "#111111" : "#fafafa",
-                    textColor: isDark ? "#dadada" : "#4c4c4c",
-                    activeTextColor: isDark ? "#ffffff" : "#111111",
+                    backgroundColor: brand.bg,
+                    textColor: brand.muted,
+                    activeTextColor: brand.text,
                   },
                   rightPanel: {
-                    backgroundColor: isDark ? "#1d1d1d" : "#fafafa",
-                    textColor: isDark ? "#fafafa" : "#111111",
+                    backgroundColor: brand.surface,
+                    textColor: brand.text,
                   },
                   typography: {
                     fontFamily: "Figtree, Arial, sans-serif",
-                    fontSize: "15px",
-                    lineHeight: "1.6",
+                    fontSize: "16px",
+                    lineHeight: "1.5",
+                    fontWeightRegular: "400",
+                    fontWeightBold: "700",
+                    fontWeightLight: "300",
                     headings: {
                       fontFamily: "Figtree, Arial, sans-serif",
+                      fontWeight: "700",
+                      lineHeight: "1.1",
                     },
                     code: {
-                      color: isDark ? "#fafafa" : "#111111",
-                      backgroundColor: isDark ? "#2e2e2e" : "#f5f5f5",
+                      color: brand.text,
+                      backgroundColor: brand.codeBg,
+                      fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+                      fontSize: "14px",
+                      lineHeight: "1.5",
                     },
                   },
-                  schema: {
-                    defaultDetailsWidth: "75%",
-                    nestedBackground: isDark ? "#161616" : "#ffffff",
-                    linesColor: isDark ? "rgba(250, 250, 250, 0.18)" : "rgba(17, 17, 17, 0.16)",
-                    typeNameColor: isDark ? "#fafafa" : "#111111",
-                    typeTitleColor: isDark ? "#fafafa" : "#111111",
-                    requireLabelColor: isDark ? "#f77e62" : "#c64eb0",
-                    labelsTextSize: "13px",
-                    nestingSpacing: "1.15em",
-                  },
+                  ...(useSchemaOverrides
+                    ? {
+                        schema: {
+                          defaultDetailsWidth: "75%",
+                          nestedBackground: brand.surfaceAlt,
+                          linesColor: brand.borderStrong,
+                          typeNameColor: brand.text,
+                          typeTitleColor: brand.text,
+                          requireLabelColor: brand.required,
+                          labelsTextSize: "13px",
+                          nestingSpacing: "1.15em",
+                        },
+                      }
+                    : {}),
                 },
               }}
             />
@@ -137,4 +210,3 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
     </div>
   );
 }
-
