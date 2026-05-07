@@ -19,7 +19,7 @@ This repository builds a **static documentation portal** (for Pages deployment):
 
 ## Local preview
 
-Start commands (note: `sync` runs automatically before `start/build`):
+Start the docs portal locally:
 
 ```bash
 npm run start
@@ -33,12 +33,8 @@ npm run build
 
 ## Where content comes from
 
-The `npm run sync` script copies into this project:
+The portal publishes:
 
-- bundled OpenAPI contract: `web/openapi.bundled.yaml` (published as `/openapi/openapi.yaml`)
-- schemas: `openapi-built/components/schemas/*`
-- `docs/reference/cop.md`
-- Postman collection JSON
-- Integration scenarios (Markdown)
-
-Paths can be overridden via env vars: `OPENAPI_SPEC_FILE`, `OPENAPI_SCHEMAS_DIR`, `COP_MD`, `POSTMAN_COLLECTION`, `INTEGRATION_DOCS_DIR`.
+- OpenAPI spec at `/openapi/openapi.yaml`
+- Postman collection at `/postman/Clear_Junction_API.postman_collection.json`
+- Additional guides and integration scenarios under `Docs`
