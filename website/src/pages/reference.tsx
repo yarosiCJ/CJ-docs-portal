@@ -94,6 +94,14 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
         );
       });
 
+      root.querySelectorAll<HTMLAnchorElement>("a[href]").forEach((link) => {
+        const isUtilityLink = Boolean(
+          link.closest(".redoc-json, pre, code, [role='tab'], button") ||
+            Array.from(link.classList).some((className) => /copy|expand|collapse/i.test(className)),
+        );
+        link.classList.toggle("redoc-description-link", !isUtilityLink);
+      });
+
       root.querySelectorAll("table span, table div, table small").forEach((element) => {
         const text = element.textContent?.trim().toLowerCase();
         element.classList.toggle("redoc-required-label", text === "required");
@@ -105,6 +113,18 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
         const className = element.getAttribute("class") ?? "";
         element.classList.toggle("redoc-status-success", /^2\d\d\b/.test(text) || className.includes("tab-success"));
         element.classList.toggle("redoc-status-error", /^[45]\d\d\b/.test(text) || className.includes("tab-error"));
+      });
+
+      root.querySelectorAll("h5").forEach((heading) => {
+        if (heading.textContent?.trim() !== "Authorizations:") return;
+
+        const authHeaderColumn = heading.parentElement;
+        const authWrap = authHeaderColumn?.parentElement;
+        authWrap?.classList.add("redoc-auth-wrap");
+        authHeaderColumn?.classList.add("redoc-auth-header-column");
+        authWrap?.querySelectorAll(":scope > div").forEach((column) => {
+          if (column !== authHeaderColumn) column.classList.add("redoc-auth-securities-column");
+        });
       });
 
       root.querySelectorAll<HTMLImageElement>("img[src*='/docs/diagrams/out/'], img[src*='docs/diagrams/out/']").forEach((img) => {
