@@ -14,6 +14,9 @@
 /docs/reference/cop.md
 /docs/integration/
 
+# Local clones for offline sync fallback (CI checkouts to repo-root `sources/`)
+/sources/
+
 # Misc
 .DS_Store
 .env.local
