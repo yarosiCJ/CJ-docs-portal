@@ -1,13 +1,23 @@
 # Clear Junction API docs portal
 
-Статический портал документации на [Docusaurus](https://docusaurus.io/):
+Static documentation portal built with [Docusaurus](https://docusaurus.io/).
 
-- `Docs` (Markdown) + автосайдбар
-- `/reference` — OpenAPI reference (Redoc)
-- `static/openapi/*` — публикуемый `openapi.yaml` + схемы
-- `static/postman/*` — публикуемая Postman коллекция
+Russian version: [README.ru.md](./README.ru.md)
 
-Перед `start/build` автоматически выполняется `npm run sync`, который копирует контент из соседних директорий в `docs/` и `static/`.
+## What it includes
+
+- **Docs** (Markdown/MDX) with an auto-generated sidebar
+- **`/reference`** — OpenAPI reference rendered with [Redoc](https://github.com/Redocly/redoc)
+- **`static/openapi/*`** — published `openapi.yaml` + schemas
+- **`static/postman/*`** — published Postman collection
+- **Integration guides/scenarios** synced from the integration repository
+
+Before `start` / `build`, `npm run sync` copies content from sibling source repos into `docs/` and `static/`.
+
+## Requirements
+
+- Node.js **20+** (CI uses **Node 24**)
+- npm 10+
 
 ## Installation
 
@@ -15,13 +25,13 @@
 npm i
 ```
 
-## Local Development
+## Local development
 
 ```bash
 npm run start
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+Starts a local development server and opens a browser window. Most changes are reflected live without a restart.
 
 ## Build
 
@@ -29,32 +39,59 @@ This command starts a local development server and opens up a browser window. Mo
 npm run build
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+Generates static content into the `build/` directory. Serve it with any static host, or use `npm run serve` locally.
 
-## Sync sources (overrides)
+## Sync sources (env overrides)
 
-По умолчанию `sync` ожидает ваши локальные пути (можно переопределить через env):
+By default `sync` looks for local sibling paths under `SOURCES_ROOT` (default: `/Users/yarosi/Documents/Python`). Override any path via env vars:
 
 ```bash
 SOURCES_ROOT="/Users/yarosi/Documents/Python" \
-OPENAPI_BUILT_DIR="/Users/yarosi/Documents/Python/ApiRefactoring/openapi-built" \
+OPENAPI_SPEC_FILE="/Users/yarosi/Documents/Python/ApiRefactoring/web/openapi.bundled.yaml" \
+OPENAPI_SCHEMAS_DIR="/Users/yarosi/Documents/Python/ApiRefactoring/openapi-built/components/schemas" \
+OPENAPI_DIAGRAMS_DIR="/Users/yarosi/Documents/Python/ApiRefactoring/docs/diagrams/out" \
 COP_MD="/Users/yarosi/Documents/Python/ApiRefactoring/docs/reference/cop.md" \
 POSTMAN_COLLECTION="/Users/yarosi/Documents/Python/Postman_CJ_sand/Clear_Junction_API.postman_collection.json" \
-INTEGRATION_DOCS_DIR="/path/to/Integration_scenarios/docs" \
+INTEGRATION_REPO_ROOT="/Users/yarosi/Documents/Python/CJ_API_Integration_Scenarios" \
 npm run sync
 ```
 
-## Pages configuration
+Synced outputs (`static/openapi/`, `static/postman/`, `docs/integration/`, etc.) are gitignored and regenerated on each build.
 
-Для публикации в GitHub/GitLab Pages обычно нужно выставить:
+## GitHub Pages
 
-- `DOCS_URL` (например `https://<org>.github.io`)
-- `DOCS_BASE_URL` (например `/<repo>/` для GitHub Pages проекта)
+Workflow: [`.github/workflows/pages.yml`](../.github/workflows/pages.yml)
 
-Для GitHub Pages workflow уже добавлен в `.github/workflows/pages.yml` и автоматически выставляет `DOCS_URL`/`DOCS_BASE_URL`.
+It auto-sets:
 
-В CI workflow дополнительно делает checkout источников:
+- `DOCS_URL` — e.g. `https://<owner>.github.io`
+- `DOCS_BASE_URL` — e.g. `/<repo>/`
 
-- contract: `yarosiCJ/CJ_API_Refact` → `sources/contract` (используется `web/openapi.bundled.yaml`)
-- collection: `yarosiCJ/CJ_API_Sandbox` → `sources/collection`
-- integration: `yarosiCJ/CJ_API_Integration_Scenarios` → `sources/integration` (используется `docs/`)
+CI also checkouts source repositories (requires repo secret `DOCS_SOURCES_TOKEN`):
+
+| Source | Repository | Checkout path | Used for |
+| --- | --- | --- | --- |
+| Contract | `yarosiCJ/CJ_API_Refact` | `sources/contract` | `web/openapi.bundled.yaml`, schemas, diagrams, COP |
+| Collection | `yarosiCJ/CJ_API_Sandbox` | `sources/collection` | Postman collection JSON |
+| Integration | `yarosiCJ/CJ_API_Integration_Scenarios` | `sources/integration` | `docs/` + `scenarios/` |
+
+Deploy triggers:
+
+- push to `main`
+- manual `workflow_dispatch` in GitHub Actions
+
+Live site: https://yarosicj.github.io/CJ-docs-portal/
+
+## Stack (current)
+
+| Component | Project | Notes |
+| --- | --- | --- |
+| Docusaurus | `^3.10.1` (lock ≈ 3.10.1) | Latest stable is **3.10.2** — safe patch bump |
+| `@docusaurus/*` helpers | `3.10.0` | Prefer aligning all `@docusaurus/*` to the same version |
+| React | `^19` | Current; fine |
+| Redoc | `^2.5.2` (lock 2.5.2) | Latest **2.5.3** — safe patch bump |
+| TypeScript | `~6.0.2` | Latest major is **7.x**; stay on 6 unless you need 7 |
+| Node (CI) | 24 | Matches GitHub Actions current default direction |
+| Actions | `checkout@v4`, `setup-node@v4`, Pages actions v3/v4 | Still adequate; optional later bump to newer major tags |
+
+Overall the stack is **adequate and maintainable**. No urgent major upgrades are required; the main hygiene items are aligning Docusaurus package versions and optionally taking patch bumps for Docusaurus/Redoc.
