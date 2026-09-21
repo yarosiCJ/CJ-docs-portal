@@ -69,7 +69,21 @@ It auto-sets:
 - `DOCS_URL` — e.g. `https://<owner>.github.io`
 - `DOCS_BASE_URL` — e.g. `/<repo>/`
 
-CI also checkouts source repositories (requires repo secret `DOCS_SOURCES_TOKEN`):
+CI also checkouts source repositories (requires repo secret `DOCS_SOURCES_TOKEN`).
+
+Use a **Fine-grained personal access token** (preferred):
+
+1. [GitHub → Settings → Developer settings → Fine-grained tokens](https://github.com/settings/personal-access-tokens)
+2. Resource owner: `yarosiCJ`
+3. Repository access — only these three:
+   - `CJ_API_Refact`
+   - `CJ_API_Sandbox`
+   - `CJ_API_Integration_Scenarios`
+4. Repository permissions: **Contents: Read-only** (Metadata is included automatically)
+5. Save the token as Actions secret `DOCS_SOURCES_TOKEN` on `CJ-docs-portal`  
+   (`Settings → Secrets and variables → Actions`)
+
+A classic PAT with the `repo` scope also works, but fine-grained is the documented setup.
 
 | Source | Repository | Checkout path | Used for |
 | --- | --- | --- | --- |

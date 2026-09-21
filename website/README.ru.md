@@ -69,7 +69,21 @@ Workflow: [`.github/workflows/pages.yml`](../.github/workflows/pages.yml)
 - `DOCS_URL` — например `https://<owner>.github.io`
 - `DOCS_BASE_URL` — например `/<repo>/`
 
-В CI дополнительно делается checkout исходников (нужен secret `DOCS_SOURCES_TOKEN`):
+В CI дополнительно делается checkout исходников (нужен secret `DOCS_SOURCES_TOKEN`).
+
+Используйте **Fine-grained personal access token** (предпочтительный вариант):
+
+1. [GitHub → Settings → Developer settings → Fine-grained tokens](https://github.com/settings/personal-access-tokens)
+2. Resource owner: `yarosiCJ`
+3. Repository access — только эти три репозитория:
+   - `CJ_API_Refact`
+   - `CJ_API_Sandbox`
+   - `CJ_API_Integration_Scenarios`
+4. Repository permissions: **Contents: Read-only** (Metadata добавляется автоматически)
+5. Сохраните токен как Actions secret `DOCS_SOURCES_TOKEN` в `CJ-docs-portal`  
+   (`Settings → Secrets and variables → Actions`)
+
+Classic PAT со scope `repo` тоже работает, но в проекте зафиксирован fine-grained.
 
 | Источник | Репозиторий | Путь checkout | Для чего |
 | --- | --- | --- | --- |
