@@ -103,6 +103,7 @@
   --cj-redoc-method-delete-text: #111111;
 
   --ifm-code-font-size: 95%;
+  --ifm-table-cell-padding: 0.75rem 1rem;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
@@ -157,6 +158,12 @@ html,
 body {
   background: var(--cj-bg);
   color: var(--cj-text);
+}
+
+.markdown table th,
+.markdown table td {
+  vertical-align: top;
+  text-align: left;
 }
 
 .navbar {
@@ -330,6 +337,56 @@ body {
   text-underline-offset: 3px;
 }
 
+/* Infima draws a border grid on every table. Redoc schema cells are borderless by
+   design (zero horizontal padding) and use border-left on the field cell as the
+   parameter tree line, which the grid's top/bottom rules cut at every row. */
+.redocPage table td,
+.redocPage table th {
+  border-top: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+}
+
+.redocPage table tr > td:first-child:not([kind='field']),
+.redocPage table tr > th:first-child {
+  border-left: 0 !important;
+}
+
+.redocPage table td {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+}
+
+.redocPage table td[kind='field'] {
+  padding-right: 18px !important;
+}
+
+.redocPage table tr > td + td {
+  border-left: 1px solid var(--cj-border) !important;
+  padding-left: 18px !important;
+  padding-right: 18px !important;
+}
+
+.redocPage .redoc-markdown table {
+  width: 100%;
+  border-collapse: collapse !important;
+  margin: 1.25rem 0 1.5rem !important;
+}
+
+.redocPage .redoc-markdown table th,
+.redocPage .redoc-markdown table td {
+  padding: 12px 16px !important;
+  border: 1px solid var(--cj-border) !important;
+  line-height: 1.55 !important;
+  text-align: left;
+  vertical-align: top;
+}
+
+.redocPage .redoc-markdown table thead th {
+  background: var(--cj-grey-f5f);
+  font-weight: 600;
+}
+
 [data-theme='dark'] .redocPage,
 [data-theme='dark'] .redocPage div,
 [data-theme='dark'] .redocPage span,
@@ -344,8 +401,26 @@ body {
 [data-theme='dark'] .redocPage tr,
 [data-theme='dark'] .redocPage td,
 [data-theme='dark'] .redocPage th {
-  background: #161616 !important;
+  /* background-color, not background: the shorthand would drop the gradient Redoc
+     paints on the first and last field cell to start the parameter tree line. */
+  background-color: #161616 !important;
+}
+
+/* Redoc themes the parameter tree line itself (schema.linesColor in reference.tsx),
+   so recolouring every cell border here would wash it out. */
+[data-theme='dark'] .redocPage table,
+[data-theme='dark'] .redocPage tbody,
+[data-theme='dark'] .redocPage thead,
+[data-theme='dark'] .redocPage tr,
+[data-theme='dark'] .redocPage td:not([kind='field']),
+[data-theme='dark'] .redocPage th {
   border-color: var(--cj-border) !important;
+}
+
+/* The flat #161616 above also removes Infima's row striping, which is what keeps
+   rows apart now that the grid is gone. */
+[data-theme='dark'] .redocPage table tr:nth-child(2n) td {
+  background-color: var(--cj-grey-1d1) !important;
 }
 
 [data-theme='dark'] .redocPage .redoc-auth-securities-column {
