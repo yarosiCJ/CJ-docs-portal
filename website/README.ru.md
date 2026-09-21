@@ -9,8 +9,10 @@ English version: [README.md](./README.md)
 - **Docs** (Markdown/MDX) + автосайдбар
 - **`/reference`** — OpenAPI reference через [Redoc](https://github.com/Redocly/redoc)
 - **`static/openapi/*`** — публикуемый `openapi.yaml` + схемы
-- **`static/postman/*`** — публикуемая Postman-коллекция
-- **Integration guides/scenarios** — синхронизация из integration-репозитория
+- **`static/postman/*`** — Postman-коллекция (по умолчанию выключена)
+- **Integration guides/scenarios** (по умолчанию выключены)
+
+Опциональные разделы задаются в [`portal-features.json`](./portal-features.json). Чтобы опубликовать их, поставьте `"docs": true`, `"postman": true` и/или `"integration": true`, либо переопределите на сборке через `PORTAL_ENABLE_DOCS=true` / `PORTAL_ENABLE_POSTMAN=true` / `PORTAL_ENABLE_INTEGRATION=true`. Пункт Docs в верхней навигации по умолчанию скрыт; в шапке остаётся API.
 
 Перед `start` / `build` автоматически выполняется `npm run sync`, который копирует контент из соседних исходников в `docs/` и `static/`.
 
@@ -77,8 +79,8 @@ Workflow: [`.github/workflows/pages.yml`](../.github/workflows/pages.yml)
 
 Триггеры деплоя:
 
-- push в `main`
-- ручной `workflow_dispatch` в GitHub Actions
+- push в `main` (берёт флаги из [`website/portal-features.json`](./portal-features.json))
+- ручной `workflow_dispatch` в GitHub Actions, с опциональными чекбоксами публикации Postman / integration, даже если в JSON флаги выключены
 
 Сайт: https://yarosicj.github.io/CJ-docs-portal/
 

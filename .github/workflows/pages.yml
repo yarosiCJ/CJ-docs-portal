@@ -3,7 +3,20 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: ["main"]
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      enable_docs:
+        description: "Show Docs in the top navigation (overrides website/portal-features.json)"
+        type: boolean
+        default: false
+      enable_postman:
+        description: "Publish Postman collection (overrides website/portal-features.json)"
+        type: boolean
+        default: false
+      enable_integration:
+        description: "Publish integration guides and scenarios (overrides website/portal-features.json)"
+        type: boolean
+        default: false
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -82,6 +95,19 @@ jobs:
           echo "INTEGRATION_REPO_ROOT=${GITHUB_WORKSPACE}/sources/integration" >> "$GITHUB_ENV"
           echo "INTEGRATION_DOCS_DIR=${GITHUB_WORKSPACE}/sources/integration/docs" >> "$GITHUB_ENV"
           echo "INTEGRATION_SCENARIOS_DIR=${GITHUB_WORKSPACE}/sources/integration/scenarios" >> "$GITHUB_ENV"
+
+      - name: Apply optional feature overrides
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          if [ "${{ inputs.enable_docs }}" = "true" ]; then
+            echo "PORTAL_ENABLE_DOCS=true" >> "$GITHUB_ENV"
+          fi
+          if [ "${{ inputs.enable_postman }}" = "true" ]; then
+            echo "PORTAL_ENABLE_POSTMAN=true" >> "$GITHUB_ENV"
+          fi
+          if [ "${{ inputs.enable_integration }}" = "true" ]; then
+            echo "PORTAL_ENABLE_INTEGRATION=true" >> "$GITHUB_ENV"
+          fi
 
       - name: Build site
         working-directory: website

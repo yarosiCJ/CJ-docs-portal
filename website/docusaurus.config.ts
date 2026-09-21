@@ -1,8 +1,11 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import {loadPortalFeatures} from './scripts/portal-features.mjs';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
+
+const features = loadPortalFeatures();
 
 const config: Config = {
   title: 'Clear Junction API',
@@ -45,6 +48,13 @@ const config: Config = {
         docs: {
           sidebarPath: './sidebars.ts',
           routeBasePath: 'docs',
+          exclude: [
+            '**/_*.{js,jsx,ts,tsx,md,mdx}',
+            '**/_*/**',
+            '**/*.test.{js,jsx,ts,tsx}',
+            '**/__tests__/**',
+            ...(features.postman ? [] : ['**/postman.mdx']),
+          ],
         },
         blog: {
           showReadingTime: true,
@@ -64,6 +74,10 @@ const config: Config = {
     ],
   ],
 
+  customFields: {
+    features,
+  },
+
   themeConfig: {
     image: 'img/social-card.png',
     colorMode: {
@@ -79,18 +93,26 @@ const config: Config = {
         srcDark: 'img/logo-dark.svg',
       },
       items: [
-        {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
-          position: 'left',
-          label: 'Docs',
-        },
+        ...(features.docs
+          ? [
+              {
+                type: 'docSidebar' as const,
+                sidebarId: 'tutorialSidebar',
+                position: 'left' as const,
+                label: 'Docs',
+              },
+            ]
+          : []),
         {to: '/reference', label: 'API', position: 'left'},
-        {
-          to: '/docs/postman',
-          label: 'Postman',
-          position: 'right',
-        },
+        ...(features.postman
+          ? [
+              {
+                to: '/docs/postman',
+                label: 'Postman',
+                position: 'right' as const,
+              },
+            ]
+          : []),
       ],
     },
     footer: {
@@ -109,15 +131,19 @@ const config: Config = {
             },
           ],
         },
-        {
-          title: 'Community',
-          items: [
-            {
-              label: 'Postman collection',
-              to: '/docs/postman',
-            },
-          ],
-        },
+        ...(features.postman
+          ? [
+              {
+                title: 'Community',
+                items: [
+                  {
+                    label: 'Postman collection',
+                    to: '/docs/postman',
+                  },
+                ],
+              },
+            ]
+          : []),
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Clear Junction`,
     },

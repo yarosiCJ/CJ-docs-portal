@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import {loadPortalFeatures} from "./portal-features.mjs";
 
 const portalRoot = path.resolve(import.meta.dirname, "..");
 
@@ -124,6 +125,8 @@ const INTEGRATION_SCENARIOS_DIR = path.resolve(
   getEnv("INTEGRATION_SCENARIOS_DIR", path.join(INTEGRATION_REPO_ROOT, "scenarios")),
 );
 
+const features = loadPortalFeatures();
+
 const dstDocs = path.join(portalRoot, "docs");
 const dstStatic = path.join(portalRoot, "static");
 
@@ -137,16 +140,27 @@ const dstIntegrationScenariosDir = path.join(dstIntegrationDir, "scenarios");
 const dstReferenceDir = path.join(dstDocs, "reference");
 
 console.log("[sync] portalRoot:", portalRoot);
+console.log("[sync] features:", features);
 
 // Keep the default tutorial docs if present, but replace the folders we manage.
 await fs.mkdir(dstDocs, { recursive: true });
 await fs.mkdir(dstStatic, { recursive: true });
 
 await ensureEmptyDir(dstOpenApiDir);
-await ensureEmptyDir(dstPostmanDir);
 await ensureEmptyDir(dstDiagramsDir);
-await ensureEmptyDir(dstIntegrationDir);
 await fs.mkdir(dstReferenceDir, { recursive: true });
+
+if (features.postman) {
+  await ensureEmptyDir(dstPostmanDir);
+} else {
+  await fs.rm(dstPostmanDir, { recursive: true, force: true });
+}
+
+if (features.integration) {
+  await ensureEmptyDir(dstIntegrationDir);
+} else {
+  await fs.rm(dstIntegrationDir, { recursive: true, force: true });
+}
 
 if (OPENAPI_SPEC_FILE) {
   const dstOpenApiSpec = path.join(dstOpenApiDir, "openapi.yaml");
@@ -165,48 +179,61 @@ if (OPENAPI_SPEC_FILE) {
 await copyDirIfExists(OPENAPI_SCHEMAS_DIR, dstSchemasDir);
 await copyDirIfExists(OPENAPI_DIAGRAMS_DIR, dstDiagramsDir);
 
-if (POSTMAN_COLLECTION) {
-  await copyFileIfExists(POSTMAN_COLLECTION, path.join(dstPostmanDir, "Clear_Junction_API.postman_collection.json"));
+if (features.postman) {
+  if (POSTMAN_COLLECTION) {
+    await copyFileIfExists(
+      POSTMAN_COLLECTION,
+      path.join(dstPostmanDir, "Clear_Junction_API.postman_collection.json"),
+    );
+  } else {
+    console.warn("[sync] missing Postman collection file (no candidates found)");
+  }
 } else {
-  console.warn("[sync] missing Postman collection file (no candidates found)");
+  console.log("[sync] skipping Postman collection (portal-features.postman=false)");
 }
+
 await copyFileIfExists(COP_MD, path.join(dstReferenceDir, "cop.md"));
-await copyDirIfExistsExcludingReadmes(INTEGRATION_GUIDES_DIR, dstIntegrationGuidesDir);
-await copyDirIfExistsExcludingReadmes(INTEGRATION_SCENARIOS_DIR, dstIntegrationScenariosDir);
 
-// Ensure the integration section is visible in the sidebar even if the source repo
-// currently contains only README.md (which we intentionally exclude).
-await writeFile(
-  dstIntegrationDir,
-  "_category_.json",
-  JSON.stringify({ label: "Integration", position: 20 }, null, 2) + "\n",
-);
-await writeFile(
-  dstIntegrationDir,
-  "index.mdx",
-  `---\nsidebar_position: 1\n---\n\n# Integration\n\nThis section is synced from the integration scenarios repository.\n\n- **Guides** are taken from \`docs/**\`\n- **Scenarios** are taken from \`scenarios/**\`\n- Files named \`README.md\` are intentionally excluded everywhere.\n`,
-);
+if (features.integration) {
+  await copyDirIfExistsExcludingReadmes(INTEGRATION_GUIDES_DIR, dstIntegrationGuidesDir);
+  await copyDirIfExistsExcludingReadmes(INTEGRATION_SCENARIOS_DIR, dstIntegrationScenariosDir);
 
-await writeFile(
-  dstIntegrationGuidesDir,
-  "_category_.json",
-  JSON.stringify({ label: "Guides", position: 1 }, null, 2) + "\n",
-);
-await writeFile(
-  dstIntegrationGuidesDir,
-  "index.mdx",
-  `---\nsidebar_position: 1\n---\n\n# Integration guides\n\nNarrative documentation for integration flows, prerequisites, and troubleshooting.\n\nContent is synced from the integration scenarios repository (\`docs/**\`) excluding \`README.md\`.\n`,
-);
-await writeFile(
-  dstIntegrationScenariosDir,
-  "_category_.json",
-  JSON.stringify({ label: "Scenarios", position: 2 }, null, 2) + "\n",
-);
-await writeFile(
-  dstIntegrationScenariosDir,
-  "index.mdx",
-  `---\nsidebar_position: 1\n---\n\n# Integration scenarios\n\nStep-by-step playbooks and scenario documents.\n\nContent is synced from the integration scenarios repository (\`scenarios/**\`) excluding \`README.md\`.\n`,
-);
+  // Ensure the integration section is visible in the sidebar even if the source repo
+  // currently contains only README.md (which we intentionally exclude).
+  await writeFile(
+    dstIntegrationDir,
+    "_category_.json",
+    JSON.stringify({ label: "Integration", position: 20 }, null, 2) + "\n",
+  );
+  await writeFile(
+    dstIntegrationDir,
+    "index.mdx",
+    `---\nsidebar_position: 1\n---\n\n# Integration\n\nThis section is synced from the integration scenarios repository.\n\n- **Guides** are taken from \`docs/**\`\n- **Scenarios** are taken from \`scenarios/**\`\n- Files named \`README.md\` are intentionally excluded everywhere.\n`,
+  );
+
+  await writeFile(
+    dstIntegrationGuidesDir,
+    "_category_.json",
+    JSON.stringify({ label: "Guides", position: 1 }, null, 2) + "\n",
+  );
+  await writeFile(
+    dstIntegrationGuidesDir,
+    "index.mdx",
+    `---\nsidebar_position: 1\n---\n\n# Integration guides\n\nNarrative documentation for integration flows, prerequisites, and troubleshooting.\n\nContent is synced from the integration scenarios repository (\`docs/**\`) excluding \`README.md\`.\n`,
+  );
+  await writeFile(
+    dstIntegrationScenariosDir,
+    "_category_.json",
+    JSON.stringify({ label: "Scenarios", position: 2 }, null, 2) + "\n",
+  );
+  await writeFile(
+    dstIntegrationScenariosDir,
+    "index.mdx",
+    `---\nsidebar_position: 1\n---\n\n# Integration scenarios\n\nStep-by-step playbooks and scenario documents.\n\nContent is synced from the integration scenarios repository (\`scenarios/**\`) excluding \`README.md\`.\n`,
+  );
+} else {
+  console.log("[sync] skipping integration guides/scenarios (portal-features.integration=false)");
+}
 
 console.log("[sync] done");
 

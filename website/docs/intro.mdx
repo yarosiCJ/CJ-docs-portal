@@ -2,8 +2,7 @@
 sidebar_position: 1
 ---
 
-import Link from '@docusaurus/Link';
-import useBaseUrl from '@docusaurus/useBaseUrl';
+import {PortalPublishedArtifacts, PortalWhatsIncluded} from '@site/src/components/PortalWhatsIncluded';
 
 # Clear Junction API docs portal
 
@@ -11,11 +10,7 @@ This repository builds a **static documentation portal** (for Pages deployment):
 
 ## What lives where
 
-- **API Reference**: <Link to="/reference">/reference</Link> (renders `openapi.yaml` via Redoc)
-- **OpenAPI file**: <a href={useBaseUrl('/openapi/openapi.yaml')}>/openapi/openapi.yaml</a>
-- **Postman**: <Link to="/docs/postman">collection page</Link>
-- **Additional parameter descriptions**: `Docs → Reference → CoP` (synced from contract sources)
-- **Integration scenarios**: `Docs → Integration` (synced from integration sources)
+<PortalWhatsIncluded />
 
 ## Local preview
 
@@ -35,6 +30,4 @@ npm run build
 
 The portal publishes:
 
-- OpenAPI spec at `/openapi/openapi.yaml`
-- Postman collection at `/postman/Clear_Junction_API.postman_collection.json`
-- Additional guides and integration scenarios under `Docs`
+<PortalPublishedArtifacts />

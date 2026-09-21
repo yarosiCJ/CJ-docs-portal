@@ -9,8 +9,10 @@ Russian version: [README.ru.md](./README.ru.md)
 - **Docs** (Markdown/MDX) with an auto-generated sidebar
 - **`/reference`** — OpenAPI reference rendered with [Redoc](https://github.com/Redocly/redoc)
 - **`static/openapi/*`** — published `openapi.yaml` + schemas
-- **`static/postman/*`** — published Postman collection
-- **Integration guides/scenarios** synced from the integration repository
+- **`static/postman/*`** — Postman collection (off by default)
+- **Integration guides/scenarios** (off by default)
+
+Optional sections are controlled by [`portal-features.json`](./portal-features.json). Set `"docs": true`, `"postman": true`, and/or `"integration": true` to publish them, or override at build time with `PORTAL_ENABLE_DOCS=true` / `PORTAL_ENABLE_POSTMAN=true` / `PORTAL_ENABLE_INTEGRATION=true`. The Docs top-nav item is off by default; the API reference stays in the header.
 
 Before `start` / `build`, `npm run sync` copies content from sibling source repos into `docs/` and `static/`.
 
@@ -77,8 +79,8 @@ CI also checkouts source repositories (requires repo secret `DOCS_SOURCES_TOKEN`
 
 Deploy triggers:
 
-- push to `main`
-- manual `workflow_dispatch` in GitHub Actions
+- push to `main` (uses [`website/portal-features.json`](./portal-features.json))
+- manual `workflow_dispatch` in GitHub Actions, with optional checkboxes to publish Postman / integration even if the JSON flags are off
 
 Live site: https://yarosicj.github.io/CJ-docs-portal/
 
