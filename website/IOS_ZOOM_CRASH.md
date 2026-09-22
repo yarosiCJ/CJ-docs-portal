@@ -191,3 +191,11 @@ git revert c0bdb12   # docs (optional)
 
 **Fix (`fix/ios-zoom-crash-r2`):** lightweight diagram-only rewrite + `loading=lazy` on iOS; keep sticky neutralization and shallow expand; do **not** hide SVGs or request samples. Log includes `diagramBroken` count.
 
+| Item | Value |
+| --- | --- |
+| Commit | `e7b0e3a` |
+| Local iPhone-UA check | **pass** — 6/6 diagrams absolute `/CJ-docs-portal/docs/diagrams/out/*-light.svg`, all `naturalWidth > 0` |
+| Pages at interruption | last deploy was `019b434` (**before** URL rewrite) — blue "?" expected until redeploy of `e7b0e3a+` |
+
+**Interrupted here:** verification incomplete in chat; journal/redeploy not finished. Continued 2026-09-22.
+
