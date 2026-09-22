@@ -70,7 +70,7 @@ Sticky sidebar after scroll: `.menu-content` `position: sticky; top: 60px`, `men
 | Perfect Scrollbar | Default (on) | `nativeScrollbars: true` |
 | Decoration observer | Sync full scan on every mutation | Debounced 120ms + rAF; disconnect during mutate |
 | Landing glow | `blur(26px)` all widths | No blur ≤996px; desktop unchanged |
-| Crash on iOS pinch-zoom | Reported on device | **Not yet re-verified on device** — structural mitigations landed |
+| Crash on iOS pinch-zoom | Reported on device | **Still reproduced on device after Pages deploy of r1** (user 2026-09-22) |
 
 ## Rollback
 
@@ -94,3 +94,74 @@ git checkout 83fba2b9269b4736d36230aecfbc147e30238b6c -- \
 ```
 
 Prefer `git revert <sha>` for each fix commit on `main` so history stays clear. Revert `nativeScrollbars` (`0c6966f`) first if only the menu UX regressed.
+
+---
+
+## Round 2 — deeper mitigations (branch `fix/ios-zoom-crash-r2`)
+
+### Round 2 baseline
+
+| Field | Value |
+| --- | --- |
+| Date | 2026-09-22 |
+| Branch | `fix/ios-zoom-crash-r2` (from `fix/ios-zoom-crash` @ `0b3e5cc`) |
+| Parent round | Round 1 deployed to Pages; **crash still reproduced on real iPhone** (user report) |
+| Constraint | Code changes **only** on `fix/ios-zoom-crash-r2` (not `main`, not amending r1) |
+
+### Round 2 plan (hypotheses after r1 failure)
+
+Round 1 removed nested scroll / Perfect Scrollbar / blur / observer thrash. Crash unchanged ⇒ likely **DOM + compositor weight of full Redoc page** under pinch-zoom:
+
+| ID | Hypothesis | Mitigation |
+| --- | --- | --- |
+| R2-A | Sticky left menu + sticky right samples create expensive layers on zoom | On iOS: force `position: static` on `.menu-content` and Redoc right panel via `.redoc-ios-lite` |
+| R2-B | SVG diagrams (~20–40KB each, several in view) re-rasterize on zoom | On iOS: do not theme-swap `img.src`; CSS-hide diagram images in lite mode |
+| R2-C | Decoration `MutationObserver` still walks huge tree | On iOS: **skip observer entirely** (one-shot optional no-op) |
+| R2-D | Deep expanded JSON/schema samples inflate DOM | On iOS Redoc options: shallow `jsonSampleExpandLevel`, `generatedPayloadSamplesMaxDepth`, `schemaExpansionLevel` |
+| R2-E | Need device-side signal that lite mode is active | Set `data-cj-ios-lite="1"` + one-time `console.info` with DOM counts for Safari Web Inspector |
+
+### Round 2 changes (to implement)
+
+- [`website/src/pages/reference.tsx`](website/src/pages/reference.tsx) — detect iPhone/iPad WebKit; lite Redoc options; skip decorations observer; mark root class + dataset; diagnostic log.
+- [`website/src/css/custom.css`](website/src/css/custom.css) — `.redocPage.redoc-ios-lite` rules for sticky off + diagram hide.
+- This journal — tests + effect after implementation.
+
+### Round 2 tests
+
+#### Desktop (must not regress non-iOS)
+
+| # | Check | Result | Notes |
+| --- | --- | --- | --- |
+| R2-D1 | Desktop UA: no `redoc-ios-lite`, decorations still run | pending | |
+| R2-D2 | Sticky menu still sticky on desktop | pending | |
+| R2-D3 | Diagrams still theme-swap on desktop | pending | |
+| R2-D4 | Menu jump / scrollYOffset still OK | pending | |
+
+#### Emulated iPhone UA (automation)
+
+| # | Check | Result | Notes |
+| --- | --- | --- | --- |
+| R2-E1 | `data-cj-ios-lite=1` and class `redoc-ios-lite` present | pending | |
+| R2-E2 | `console` / log line with node counts once | pending | |
+| R2-E3 | Menu `position` not sticky; diagrams not shown / not swapped | pending | |
+| R2-E4 | Shallow expand options reflected (fewer huge JSON blocks initially) | pending | |
+
+#### Real iPhone (user)
+
+| # | Check | Result | Notes |
+| --- | --- | --- | --- |
+| R2-M1 | Pinch-zoom `/reference` 8–10× — no crash | pending device | Deploy r2 branch via workflow_dispatch after push |
+| R2-M2 | Safari Web Inspector: see `[CJ] redoc ios-lite` log | pending device | |
+| R2-M3 | Basic navigate/scroll still usable | pending device | |
+
+### Round 2 effect
+
+_(Fill after implementation + desktop/emulated checks.)_
+
+### Round 2 rollback
+
+```bash
+git checkout fix/ios-zoom-crash   # back to r1 (still on Pages if r2 not deployed)
+# or after r2 merge/deploy:
+git revert <r2-shas>   # newest first
+```
