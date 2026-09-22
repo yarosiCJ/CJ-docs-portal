@@ -189,6 +189,7 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
                 // Top-level document scroll (no nested 100vh/overflow shell):
                 // nested scroll + sticky Redoc layers crash WebKit on iOS pinch-zoom.
                 scrollYOffset: 60,
+                nativeScrollbars: true,
                 requiredPropsFirst: true,
                 hideSchemaTitles: true,
                 theme: {
