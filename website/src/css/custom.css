@@ -929,10 +929,9 @@ body {
   position: static !important;
 }
 
-/* Loaded diagrams: reduce offscreen paint cost during pinch-zoom. */
-.redocPage.redoc-ios-lite img[src*='diagrams/out'] {
-  content-visibility: auto;
-  contain-intrinsic-size: 800px 400px;
-  max-width: 100%;
-  height: auto;
+/* Isolation step 1: hide any diagram that appears before JS removes it. */
+.redocPage.redoc-ios-lite img[src*='diagrams/out'],
+.redocPage.redoc-ios-lite img[src$='.svg'],
+.redocPage.redoc-ios-lite img[src*='.svg?'] {
+  display: none !important;
 }

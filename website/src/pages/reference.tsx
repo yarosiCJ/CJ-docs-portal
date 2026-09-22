@@ -120,32 +120,39 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
         });
       };
 
-      // Relative markdown paths like docs/diagrams/out/x.svg resolve under /reference/
-      // → 404 (blue "?" on iOS). Fix URLs without running the heavy decoration observer.
+      // Isolation step 1: drop diagram <img> so WebKit never fetches/rasterizes SVGs.
+      // Request samples stay. A follow-up step hides samples if zoom still crashes.
       let diagramTimer: ReturnType<typeof setTimeout> | undefined;
-      const scheduleDiagramRewrite = () => {
+      let diagramsRemoved = 0;
+      const stripDiagrams = () => {
+        root.querySelectorAll("img[src*='diagrams/out'], img[src*='.svg']").forEach((img) => {
+          img.remove();
+          diagramsRemoved += 1;
+        });
+      };
+      const scheduleStripDiagrams = () => {
         if (diagramTimer !== undefined) clearTimeout(diagramTimer);
         diagramTimer = setTimeout(() => {
           diagramTimer = undefined;
-          rewriteDiagramSources();
+          stripDiagrams();
         }, 100);
       };
 
-      const diagramObserver = new MutationObserver(scheduleDiagramRewrite);
-      rewriteDiagramSources();
+      const diagramObserver = new MutationObserver(scheduleStripDiagrams);
+      stripDiagrams();
       diagramObserver.observe(root, { childList: true, subtree: true });
 
       const logLite = () => {
         neutralizeStickyLayers();
-        rewriteDiagramSources();
-        const broken = Array.from(root.querySelectorAll("img[src*='diagrams']")).filter(
-          (img) => img instanceof HTMLImageElement && img.complete && img.naturalWidth === 0,
-        ).length;
+        stripDiagrams();
         console.info("[CJ] redoc ios-lite", {
           nodes: document.getElementsByTagName("*").length,
           fieldCells: document.querySelectorAll("td[kind='field']").length,
           images: document.querySelectorAll("img").length,
-          diagramBroken: broken,
+          diagramsRemoved,
+          diagramsLeft: root.querySelectorAll("img[src*='diagrams']").length,
+          requestSamples: root.querySelectorAll("[class*='react-tabs'], pre, .redoc-json").length,
+          isolation: "no-svg",
           stickyNeutralized: true,
           ua: navigator.userAgent,
         });
@@ -257,7 +264,7 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
     const liteOptions = iosLite
       ? {
           // Fewer expanded sample/schema layers → smaller DOM under pinch-zoom.
-          // Keep request samples and diagrams visible (hideRequestPayloadSample / CSS hide removed after UX feedback).
+          // Isolation step 1: SVGs stripped in the iOS effect. Request samples stay visible.
           jsonSampleExpandLevel: 1,
           jsonSamplesExpandLevel: 1,
           schemaExpansionLevel: 0,

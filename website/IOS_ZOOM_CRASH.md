@@ -199,3 +199,16 @@ git revert c0bdb12   # docs (optional)
 
 **Interrupted here:** verification incomplete in chat; journal/redeploy not finished. Continued 2026-09-22.
 
+### Round 2c — isolation: no SVG, request samples stay (2026-09-22)
+
+Device retest after URL rewrite: diagrams visible again, pinch-zoom still crashes. Two suspects: diagram SVGs and request samples.
+
+**This step only:** on iOS lite, remove diagram `<img>` (and CSS `display: none` until removal) so WebKit does not fetch or rasterize them. Request samples unchanged. Desktop unchanged.
+
+| # | Check | Result |
+| --- | --- | --- |
+| R2c-M1 | Pinch-zoom `/reference` with **no diagrams**, samples still visible | **pending device** |
+| R2c-M2 | Console `[CJ] redoc ios-lite` has `isolation: "no-svg"` and `diagramsLeft: 0` | **pending device** |
+
+If R2c-M1 still crashes → next step hides request samples and restores SVGs. If it stops crashing → SVG rasterization is the cause.
+
