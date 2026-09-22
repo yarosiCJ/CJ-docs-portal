@@ -148,13 +148,7 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
   }, [diagramsBaseUrl, isDark]);
 
   return (
-    <div
-      className={redocPageClassName}
-      style={{
-        height: "calc(100vh - var(--ifm-navbar-height))",
-        overflow: "auto",
-        background: brand.bg,
-      }}>
+    <div className={redocPageClassName} style={{ background: brand.bg }}>
       <BrowserOnly fallback={<div style={{ padding: 16 }}>Loading API reference…</div>}>
         {() => {
           // redoc expects browser globals; don't SSR it
@@ -165,6 +159,8 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
               key={useSchemaOverrides ? "schema-overrides" : "schema-base"}
               specUrl={specUrl}
               options={{
+                // Top-level document scroll (no nested 100vh/overflow shell):
+                // nested scroll + sticky Redoc layers crash WebKit on iOS pinch-zoom.
                 scrollYOffset: 60,
                 requiredPropsFirst: true,
                 hideSchemaTitles: true,
