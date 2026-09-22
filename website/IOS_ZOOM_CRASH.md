@@ -184,3 +184,10 @@ git checkout fix/ios-zoom-crash   # back to r1 (still on Pages if r2 not deploye
 git revert 16ac1a7   # code
 git revert c0bdb12   # docs (optional)
 ```
+
+### Round 2b — broken SVG on iOS (2026-09-22)
+
+**Root cause:** skipping the decoration observer left markdown paths as `docs/diagrams/out/*.svg`. On `/reference/` the browser resolves them to `/CJ-docs-portal/reference/docs/diagrams/...` → **404** (blue "?"). Desktop still rewrote URLs via the full observer.
+
+**Fix (`fix/ios-zoom-crash-r2`):** lightweight diagram-only rewrite + `loading=lazy` on iOS; keep sticky neutralization and shallow expand; do **not** hide SVGs or request samples. Log includes `diagramBroken` count.
+

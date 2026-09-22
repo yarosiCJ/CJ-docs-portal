@@ -928,3 +928,11 @@ body {
   /* Right samples column is often sticky; static reduces compositor layers on zoom. */
   position: static !important;
 }
+
+/* Loaded diagrams: reduce offscreen paint cost during pinch-zoom. */
+.redocPage.redoc-ios-lite img[src*='diagrams/out'] {
+  content-visibility: auto;
+  contain-intrinsic-size: 800px 400px;
+  max-width: 100%;
+  height: auto;
+}

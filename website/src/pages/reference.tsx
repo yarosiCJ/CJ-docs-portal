@@ -88,6 +88,24 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
     const root = document.querySelector(".redocPage");
     if (!root) return;
 
+    const rewriteDiagramSources = () => {
+      root.querySelectorAll<HTMLImageElement>("img[src*='/docs/diagrams/out/'], img[src*='docs/diagrams/out/']").forEach((img) => {
+        const currentSrc = img.getAttribute("src") ?? "";
+        const diagramMatch = currentSrc.match(
+          /(?:^|\/)docs\/diagrams\/out\/([^/?#]+?)(?:-(?:dark|light))?\.svg([?#].*)?$/i,
+        );
+        if (!diagramMatch) return;
+
+        const [, diagramName, suffix = ""] = diagramMatch;
+        const nextSrc = `${diagramsBaseUrl}${diagramName}-${isDark ? "dark" : "light"}.svg${suffix}`;
+        if (img.getAttribute("src") !== nextSrc) {
+          img.src = nextSrc;
+        }
+        img.loading = "lazy";
+        img.decoding = "async";
+      });
+    };
+
     if (iosLite) {
       root.setAttribute("data-cj-ios-lite", "1");
       document.documentElement.setAttribute("data-cj-ios-lite", "1");
@@ -102,13 +120,32 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
         });
       };
 
-      // One-shot diagnostic for Safari Web Inspector on device.
+      // Relative markdown paths like docs/diagrams/out/x.svg resolve under /reference/
+      // → 404 (blue "?" on iOS). Fix URLs without running the heavy decoration observer.
+      let diagramTimer: ReturnType<typeof setTimeout> | undefined;
+      const scheduleDiagramRewrite = () => {
+        if (diagramTimer !== undefined) clearTimeout(diagramTimer);
+        diagramTimer = setTimeout(() => {
+          diagramTimer = undefined;
+          rewriteDiagramSources();
+        }, 100);
+      };
+
+      const diagramObserver = new MutationObserver(scheduleDiagramRewrite);
+      rewriteDiagramSources();
+      diagramObserver.observe(root, { childList: true, subtree: true });
+
       const logLite = () => {
         neutralizeStickyLayers();
+        rewriteDiagramSources();
+        const broken = Array.from(root.querySelectorAll("img[src*='diagrams']")).filter(
+          (img) => img instanceof HTMLImageElement && img.complete && img.naturalWidth === 0,
+        ).length;
         console.info("[CJ] redoc ios-lite", {
           nodes: document.getElementsByTagName("*").length,
           fieldCells: document.querySelectorAll("td[kind='field']").length,
           images: document.querySelectorAll("img").length,
+          diagramBroken: broken,
           stickyNeutralized: true,
           ua: navigator.userAgent,
         });
@@ -116,6 +153,8 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
       const readyTimer = window.setTimeout(logLite, 2500);
       const lateStickyTimer = window.setTimeout(neutralizeStickyLayers, 6000);
       return () => {
+        if (diagramTimer !== undefined) clearTimeout(diagramTimer);
+        diagramObserver.disconnect();
         window.clearTimeout(readyTimer);
         window.clearTimeout(lateStickyTimer);
         root.removeAttribute("data-cj-ios-lite");
@@ -185,17 +224,7 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
           });
         });
 
-        root.querySelectorAll<HTMLImageElement>("img[src*='/docs/diagrams/out/'], img[src*='docs/diagrams/out/']").forEach((img) => {
-          const currentSrc = img.getAttribute("src") ?? "";
-          const diagramMatch = currentSrc.match(/(?:^|\/)docs\/diagrams\/out\/([^/?#]+?)(?:-(?:dark|light))?\.svg([?#].*)?$/i);
-          if (!diagramMatch) return;
-
-          const [, diagramName, suffix = ""] = diagramMatch;
-          const nextSrc = `${diagramsBaseUrl}${diagramName}-${isDark ? "dark" : "light"}.svg${suffix}`;
-          if (img.getAttribute("src") !== nextSrc) {
-            img.src = nextSrc;
-          }
-        });
+        rewriteDiagramSources();
       } finally {
         observer.observe(root, observeOptions);
       }
