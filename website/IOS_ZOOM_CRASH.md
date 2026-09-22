@@ -51,7 +51,7 @@ Sticky sidebar after scroll: `.menu-content` `position: sticky; top: 60px`, `men
 
 | # | Check | Result | Notes |
 | --- | --- | --- | --- |
-| M1 | `/reference` pinch-zoom 8–10× — no reload / crash message | **pending device** | Emulation cannot reproduce WebKit OOM; confirm on real iPhone |
+| M1 | `/reference` pinch-zoom 8–10× — no reload / crash message | **fail (device)** | Still crashes after r1 on Pages |
 | M2 | After zoom: scroll, menu, operation click still work | **pending device** | |
 | M3 | Long schema scroll (e.g. Internal Payment) without tab hang | **pending device** | Mobile viewport smoke scroll OK in emulator only |
 | M4 | `/` pinch-zoom on hero — no crash; blur-less glow OK | **pending device** | Blur-off at ≤996px verified in CSS; crash not device-tested |
@@ -126,42 +126,59 @@ Round 1 removed nested scroll / Perfect Scrollbar / blur / observer thrash. Cras
 - [`website/src/css/custom.css`](website/src/css/custom.css) — `.redocPage.redoc-ios-lite` rules for sticky off + diagram hide.
 - This journal — tests + effect after implementation.
 
+### Round 2 commits
+
+| Commit | Summary |
+| --- | --- |
+| `c0bdb12` | docs: Round 2 plan / test matrix |
+| `16ac1a7` | fix: iOS Redoc lite mode |
+
 ### Round 2 tests
+
+Environment: local `npm start` :3010 (2026-09-22). Desktop Chromium + CDP UA override for iPhone.
 
 #### Desktop (must not regress non-iOS)
 
 | # | Check | Result | Notes |
 | --- | --- | --- | --- |
-| R2-D1 | Desktop UA: no `redoc-ios-lite`, decorations still run | pending | |
-| R2-D2 | Sticky menu still sticky on desktop | pending | |
-| R2-D3 | Diagrams still theme-swap on desktop | pending | |
-| R2-D4 | Menu jump / scrollYOffset still OK | pending | |
+| R2-D1 | Desktop UA: no `redoc-ios-lite`, decorations still run | **pass** | `iosLiteClass: false`, 238 required labels |
+| R2-D2 | Sticky menu still sticky on desktop | **pass** | `menuPos: sticky`, `menuTop: 60` |
+| R2-D3 | Diagrams still theme-swap on desktop | **pass** | 6 diagram imgs present |
+| R2-D4 | Menu jump / scrollYOffset still OK | **pass** | hash `#tag/wallet_get_balance/operation/getWallet` |
 
 #### Emulated iPhone UA (automation)
 
 | # | Check | Result | Notes |
 | --- | --- | --- | --- |
-| R2-E1 | `data-cj-ios-lite=1` and class `redoc-ios-lite` present | pending | |
-| R2-E2 | `console` / log line with node counts once | pending | |
-| R2-E3 | Menu `position` not sticky; diagrams not shown / not swapped | pending | |
-| R2-E4 | Shallow expand options reflected (fewer huge JSON blocks initially) | pending | |
+| R2-E1 | `data-cj-ios-lite=1` and class `redoc-ios-lite` present | **pass** | html + `.redocPage` |
+| R2-E2 | `console` / log line with node counts once | **pass** | scheduled `[CJ] redoc ios-lite` after 2.5s |
+| R2-E3 | Menu `position` not sticky; diagrams not shown / not swapped | **pass** | `menuPos: static`, `stickyRemaining: 0`, `diagramsVisible: 0` |
+| R2-E4 | Shallow expand / no decoration labels on iOS | **pass** | `requiredLabels: 0` (observer skipped); lite Redoc options mounted via key `ios-lite` |
 
 #### Real iPhone (user)
 
 | # | Check | Result | Notes |
 | --- | --- | --- | --- |
-| R2-M1 | Pinch-zoom `/reference` 8–10× — no crash | pending device | Deploy r2 branch via workflow_dispatch after push |
-| R2-M2 | Safari Web Inspector: see `[CJ] redoc ios-lite` log | pending device | |
-| R2-M3 | Basic navigate/scroll still usable | pending device | |
+| R2-M1 | Pinch-zoom `/reference` 8–10× — no crash | **pending device** | Deploy `fix/ios-zoom-crash-r2` via workflow_dispatch |
+| R2-M2 | Safari Web Inspector: see `[CJ] redoc ios-lite` log | **pending device** | |
+| R2-M3 | Basic navigate/scroll still usable | **pending device** | Samples/request payload hidden on purpose in lite mode |
 
 ### Round 2 effect
 
-_(Fill after implementation + desktop/emulated checks.)_
+| Topic | After Round 2 (iOS only) |
+| --- | --- |
+| Decorations observer | Disabled on Apple touch WebKit |
+| Sticky layers | Forced `position: static` on sticky nodes inside `.redocPage` |
+| Diagrams | Hidden via CSS; no theme `img.src` swap |
+| Redoc options | Shallow JSON/schema expand; `pathInMiddlePanel`; hide request payload sample |
+| Desktop | Unchanged behaviour verified |
+| Crash | **Awaiting real-device retest** after Pages deploy of this branch |
 
 ### Round 2 rollback
 
 ```bash
 git checkout fix/ios-zoom-crash   # back to r1 (still on Pages if r2 not deployed)
 # or after r2 merge/deploy:
-git revert <r2-shas>   # newest first
+git revert 16ac1a7   # code
+git revert c0bdb12   # docs (optional)
 ```
