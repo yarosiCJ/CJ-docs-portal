@@ -929,3 +929,38 @@ body {
   position: static !important;
 }
 
+/*
+ * Request samples crash iOS pinch-zoom because Redoc builds each payload as
+ * ul > li plus an absolute .collapser inside overflow-x:auto; contain:content.
+ * .redocPage li { font-size: 16px; line-height: 1.5 } then inflates every row
+ * (code is 9px, the li resets to 16px). Keep the JSON, drop that chrome.
+ */
+.redocPage.redoc-ios-lite :has(> .redoc-json) {
+  overflow: visible !important;
+  contain: none !important;
+}
+
+.redocPage.redoc-ios-lite .redoc-json li,
+.redocPage.redoc-ios-lite .redoc-json .hoverable {
+  font-size: 9px !important;
+  line-height: 1.15 !important;
+}
+
+.redocPage.redoc-ios-lite .redoc-json .token,
+.redocPage.redoc-ios-lite .redoc-json .token.string,
+.redocPage.redoc-ios-lite .redoc-json .property.token.string,
+.redocPage.redoc-ios-lite .redoc-json .token.number,
+.redocPage.redoc-ios-lite .redoc-json a {
+  font-size: 9px !important;
+  text-decoration: none !important;
+}
+
+.redocPage.redoc-ios-lite .redoc-json .collapser {
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  display: inline !important;
+  width: auto !important;
+  height: auto !important;
+}
+

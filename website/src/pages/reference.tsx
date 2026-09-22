@@ -120,8 +120,8 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
         });
       };
 
-      // Isolation step 2: diagrams stay (absolute URL rewrite). Request payload samples
-      // are not rendered (`hideRequestPayloadSample`). Response samples stay.
+      // Diagrams stay. Request samples stay, but iOS CSS flattens the JSON widget
+      // (no 16px li rows, no absolute collapsers, no overflow/contain layer).
       let diagramTimer: ReturnType<typeof setTimeout> | undefined;
       const scheduleDiagramRewrite = () => {
         if (diagramTimer !== undefined) clearTimeout(diagramTimer);
@@ -148,7 +148,11 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
           images: document.querySelectorAll("img").length,
           diagrams: diagrams.length,
           diagramBroken: broken,
-          isolation: "no-request-sample",
+          requestSamples: root.querySelectorAll(".redoc-json").length,
+          absoluteCollapsers: Array.from(root.querySelectorAll(".redoc-json .collapser")).filter(
+            (node) => node instanceof HTMLElement && getComputedStyle(node).position === "absolute",
+          ).length,
+          isolation: "json-flat",
           stickyNeutralized: true,
           ua: navigator.userAgent,
         });
@@ -259,8 +263,7 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
   const redocOptions = useMemo(() => {
     const liteOptions = iosLite
       ? {
-          // Isolation step 2: no request payload sample. Diagrams stay visible.
-          hideRequestPayloadSample: true,
+          // Samples stay visible. iOS CSS removes the widget chrome that crashed pinch-zoom.
           jsonSampleExpandLevel: 1,
           jsonSamplesExpandLevel: 1,
           schemaExpansionLevel: 0,

@@ -221,5 +221,49 @@ SVG rasterization is not sufficient to explain the crash.
 | R2d-M1 | Pinch-zoom `/reference` with diagrams visible, **no request samples** | **pending device** |
 | R2d-M2 | Console `isolation: "no-request-sample"` | **pending device** |
 
-If R2d-M1 still crashes → neither SVG nor request payload samples alone explain it. If it stops → request samples are the cause.
+| R2d-M1 | Pinch-zoom `/reference` with diagrams visible, **no request samples** | **pass** | User: diagrams back, crash gone |
+| R2d-M2 | Console `isolation: "no-request-sample"` | **pass** (implied) | Request samples not on screen |
+
+Request payload samples are sufficient to cause the crash. Response samples stayed and did not.
+
+### Round 2e — why request samples crash (2026-09-22)
+
+Redoc renders each payload as nested `<ul class="obj"><li><div class="hoverable">`, plus a `<button class="collapser">` with `position: absolute` inside a box that is `overflow-x: auto; contain: content`.
+
+Portal CSS then inflates every one of those rows:
+
+```css
+.redocPage li { font-size: 16px; line-height: 1.5; }
+```
+
+The sample `code` is 9px on iOS, but the `li` rule resets each property row to 16px. `.token.string { font-size: 0.85em }` then paints tokens at 13.6px. Measured on a live sample: `code` 9px → `ul` 9px → `li`/`div.hoverable` 16px → token 13.6px.
+
+Desktop DOM (full trees, same markup iOS was rendering before the hide):
+
+| | Request samples | Response samples |
+| --- | --- | --- |
+| JSON blocks | 36 | 39 |
+| `position: absolute` collapsers | 332 | 167 |
+| HTML | 366 KB | 157 KB |
+| `<a href>` inside JSON | 18 | 2 |
+
+The heavy blocks are payout bodies (`createSwiftPayout`, CHAPS, SEPA, FPS): `allOf` plus nested `oneOf` (payee, address) become 21–24 absolute buttons and ~25 KB of list rows each. Response schemas have no `oneOf` and stay about half the size. `generatedPayloadSamplesMaxDepth: 2` does not apply when the widget is hidden; while samples were visible it did not stop the crash, because the `li` override and the absolute/overflow chrome remain on every row that is still generated.
+
+Webhook URL strings are a smaller extra: Redoc turns them into real `<a href>` (underline, 16px) inside the same rows. There are no `x-codeSamples`.
+
+### Round 2f — fix: flatten JSON widgets on iOS (2026-09-22)
+
+Keep request samples. On `.redoc-ios-lite` only:
+
+- `.redoc-json li` / `.hoverable` use 9px and line-height 1.15, so `.redocPage li { font-size: 16px }` does not inflate sample rows.
+- Tokens and webhook `<a>` inside `.redoc-json` stay 9px, no underline.
+- `.collapser` is `position: static` (no absolute layer per object).
+- The sample wrapper (`:has(> .redoc-json)`) loses `overflow-x: auto` and `contain: content`.
+
+Desktop rules are unchanged. `hideRequestPayloadSample` removed.
+
+| # | Check | Result |
+| --- | --- | --- |
+| R2f-M1 | Pinch-zoom `/reference` with diagrams and request samples visible | **pending device** |
+| R2f-M2 | Console `isolation: "json-flat"` and `absoluteCollapsers: 0` | **pending device** |
 
