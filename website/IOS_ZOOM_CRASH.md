@@ -115,9 +115,9 @@ Round 1 removed nested scroll / Perfect Scrollbar / blur / observer thrash. Cras
 | ID | Hypothesis | Mitigation |
 | --- | --- | --- |
 | R2-A | Sticky left menu + sticky right samples create expensive layers on zoom | On iOS: force `position: static` on `.menu-content` and Redoc right panel via `.redoc-ios-lite` |
-| R2-B | SVG diagrams (~20–40KB each, several in view) re-rasterize on zoom | On iOS: do not theme-swap `img.src`; CSS-hide diagram images in lite mode |
+| R2-B | SVG diagrams (~20–40KB each, several in view) re-rasterize on zoom | Initially CSS-hid diagrams; **reverted** — diagrams stay visible; no theme img.src swap |
 | R2-C | Decoration `MutationObserver` still walks huge tree | On iOS: **skip observer entirely** (one-shot optional no-op) |
-| R2-D | Deep expanded JSON/schema samples inflate DOM | On iOS Redoc options: shallow `jsonSampleExpandLevel`, `generatedPayloadSamplesMaxDepth`, `schemaExpansionLevel` |
+| R2-D | Deep expanded JSON/schema samples inflate DOM | Shallow expand; initially hid request samples — **reverted** after UX feedback |
 | R2-E | Need device-side signal that lite mode is active | Set `data-cj-ios-lite="1"` + one-time `console.info` with DOM counts for Safari Web Inspector |
 
 ### Round 2 changes (to implement)
@@ -133,7 +133,7 @@ Round 1 removed nested scroll / Perfect Scrollbar / blur / observer thrash. Cras
 | `c0bdb12` | docs: Round 2 plan / test matrix |
 | `16ac1a7` | fix: iOS Redoc lite mode |
 | `cbe400e` | docs: Round 2 test results |
-| _(pending)_ | restore request samples + SVG diagrams on iOS lite |
+| `6843f55` | restore request samples + SVG diagrams on iOS lite |
 
 ### Round 2 tests
 
