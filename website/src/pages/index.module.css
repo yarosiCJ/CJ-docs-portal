@@ -148,6 +148,13 @@
   z-index: 0;
 }
 
+@media (max-width: 996px) {
+  .glow {
+    /* Blur forces expensive WebKit re-rasterization on pinch-zoom. */
+    filter: none;
+  }
+}
+
 .heroCard {
   position: relative;
   z-index: 1;
