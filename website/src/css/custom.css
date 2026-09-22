@@ -911,3 +911,25 @@ body {
   color: var(--cj-sec-cerulean-light) !important;
   text-decoration-color: var(--cj-sec-cerulean-light) !important;
 }
+
+/*
+ * iOS WebKit pinch-zoom crash mitigations (Round 2).
+ * Class is applied only when Apple touch WebKit is detected in reference.tsx.
+ */
+.redocPage.redoc-ios-lite .menu-content {
+  position: static !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+.redocPage.redoc-ios-lite [class*='api-content'] > div > div:last-child,
+.redocPage.redoc-ios-lite .api-content > div > div:last-child {
+  /* Right samples column is often sticky; static reduces compositor layers on zoom. */
+  position: static !important;
+}
+
+.redocPage.redoc-ios-lite img[src*='diagrams/out'],
+.redocPage.redoc-ios-lite img[src*='docs/diagrams/out'] {
+  display: none !important;
+}

@@ -23,6 +23,15 @@ function shouldUseSchemaOverridesFromLocation(): boolean {
   return true;
 }
 
+/** iPhone / iPod / iPad (incl. iPadOS desktop UA). Used for WebKit zoom crash mitigations. */
+function isAppleTouchWebKit(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  if (/iP(hone|od|ad)/.test(ua)) return true;
+  // iPadOS 13+ may report as MacIntel with touch
+  return navigator.platform === "MacIntel" && (navigator.maxTouchPoints ?? 0) > 1;
+}
+
 export default function Reference(): React.ReactElement {
   const specUrl = useBaseUrl("/openapi/openapi.yaml");
 
@@ -40,6 +49,11 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
   const [useSchemaOverrides, setUseSchemaOverrides] = useState<boolean>(() =>
     shouldUseSchemaOverridesFromLocation(),
   );
+  const [iosLite, setIosLite] = useState(false);
+
+  useEffect(() => {
+    setIosLite(isAppleTouchWebKit());
+  }, []);
 
   useEffect(() => {
     const update = () => setUseSchemaOverrides(shouldUseSchemaOverridesFromLocation());
@@ -53,8 +67,9 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
   }, []);
 
   const redocPageClassName = useMemo(() => {
-    return `redocPage ${useSchemaOverrides ? "redoc-schema-overrides" : "redoc-schema-base"}`;
-  }, [useSchemaOverrides]);
+    const schemaClass = useSchemaOverrides ? "redoc-schema-overrides" : "redoc-schema-base";
+    return `redocPage ${schemaClass}${iosLite ? " redoc-ios-lite" : ""}`;
+  }, [useSchemaOverrides, iosLite]);
 
   const brand = {
     bg: isDark ? "#111111" : "#fafafa",
@@ -72,6 +87,41 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
   useEffect(() => {
     const root = document.querySelector(".redocPage");
     if (!root) return;
+
+    if (iosLite) {
+      root.setAttribute("data-cj-ios-lite", "1");
+      document.documentElement.setAttribute("data-cj-ios-lite", "1");
+
+      const neutralizeStickyLayers = () => {
+        root.querySelectorAll("*").forEach((node) => {
+          if (!(node instanceof HTMLElement)) return;
+          const position = getComputedStyle(node).position;
+          if (position === "sticky" || position === "-webkit-sticky") {
+            node.style.setProperty("position", "static", "important");
+          }
+        });
+      };
+
+      // One-shot diagnostic for Safari Web Inspector on device.
+      const logLite = () => {
+        neutralizeStickyLayers();
+        console.info("[CJ] redoc ios-lite", {
+          nodes: document.getElementsByTagName("*").length,
+          fieldCells: document.querySelectorAll("td[kind='field']").length,
+          images: document.querySelectorAll("img").length,
+          stickyNeutralized: true,
+          ua: navigator.userAgent,
+        });
+      };
+      const readyTimer = window.setTimeout(logLite, 2500);
+      const lateStickyTimer = window.setTimeout(neutralizeStickyLayers, 6000);
+      return () => {
+        window.clearTimeout(readyTimer);
+        window.clearTimeout(lateStickyTimer);
+        root.removeAttribute("data-cj-ios-lite");
+        document.documentElement.removeAttribute("data-cj-ios-lite");
+      };
+    }
 
     let debounceTimer: ReturnType<typeof setTimeout> | undefined;
     let rafId: number | undefined;
@@ -172,7 +222,92 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
       if (rafId !== undefined) cancelAnimationFrame(rafId);
       observer.disconnect();
     };
-  }, [diagramsBaseUrl, isDark]);
+  }, [diagramsBaseUrl, isDark, iosLite]);
+
+  const redocOptions = useMemo(() => {
+    const liteOptions = iosLite
+      ? {
+          // Fewer expanded sample/schema layers → smaller DOM under pinch-zoom.
+          jsonSampleExpandLevel: 1,
+          jsonSamplesExpandLevel: 1,
+          schemaExpansionLevel: 0,
+          schemasExpansionLevel: 0,
+          generatedPayloadSamplesMaxDepth: 2,
+          generatedSamplesMaxDepth: 2,
+          expandResponses: "",
+          pathInMiddlePanel: true,
+          hideRequestPayloadSample: true,
+        }
+      : {};
+
+    return {
+      // Top-level document scroll (no nested 100vh/overflow shell):
+      // nested scroll + sticky Redoc layers crash WebKit on iOS pinch-zoom.
+      scrollYOffset: 60,
+      nativeScrollbars: true,
+      requiredPropsFirst: true,
+      hideSchemaTitles: true,
+      ...liteOptions,
+      theme: {
+        colors: {
+          primary: {
+            main: brand.accent,
+          },
+          text: {
+            primary: brand.text,
+            secondary: brand.muted,
+          },
+          border: {
+            dark: brand.borderStrong,
+            light: brand.borderSoft,
+          },
+        },
+        sidebar: {
+          backgroundColor: brand.bg,
+          textColor: brand.muted,
+          activeTextColor: brand.text,
+        },
+        rightPanel: {
+          backgroundColor: brand.surface,
+          textColor: brand.text,
+        },
+        typography: {
+          fontFamily: "Figtree, Arial, sans-serif",
+          fontSize: "16px",
+          lineHeight: "1.5",
+          fontWeightRegular: "400",
+          fontWeightBold: "700",
+          fontWeightLight: "300",
+          headings: {
+            fontFamily: "Figtree, Arial, sans-serif",
+            fontWeight: "700",
+            lineHeight: "1.1",
+          },
+          code: {
+            color: brand.text,
+            backgroundColor: brand.codeBg,
+            fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+            fontSize: "14px",
+            lineHeight: "1.5",
+          },
+        },
+        ...(useSchemaOverrides
+          ? {
+              schema: {
+                defaultDetailsWidth: "75%",
+                nestedBackground: brand.surfaceAlt,
+                linesColor: brand.borderStrong,
+                typeNameColor: brand.text,
+                typeTitleColor: brand.text,
+                requireLabelColor: brand.required,
+                labelsTextSize: "13px",
+                nestingSpacing: "1.15em",
+              },
+            }
+          : {}),
+      },
+    };
+  }, [brand.accent, brand.bg, brand.borderSoft, brand.borderStrong, brand.codeBg, brand.muted, brand.required, brand.surface, brand.surfaceAlt, brand.text, iosLite, useSchemaOverrides]);
 
   return (
     <div className={redocPageClassName} style={{ background: brand.bg }}>
@@ -183,74 +318,9 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
           const { RedocStandalone } = require("redoc");
           return (
             <RedocStandalone
-              key={useSchemaOverrides ? "schema-overrides" : "schema-base"}
+              key={`${useSchemaOverrides ? "schema-overrides" : "schema-base"}-${iosLite ? "ios-lite" : "full"}`}
               specUrl={specUrl}
-              options={{
-                // Top-level document scroll (no nested 100vh/overflow shell):
-                // nested scroll + sticky Redoc layers crash WebKit on iOS pinch-zoom.
-                scrollYOffset: 60,
-                nativeScrollbars: true,
-                requiredPropsFirst: true,
-                hideSchemaTitles: true,
-                theme: {
-                  colors: {
-                    primary: {
-                      main: brand.accent,
-                    },
-                    text: {
-                      primary: brand.text,
-                      secondary: brand.muted,
-                    },
-                    border: {
-                      dark: brand.borderStrong,
-                      light: brand.borderSoft,
-                    },
-                  },
-                  sidebar: {
-                    backgroundColor: brand.bg,
-                    textColor: brand.muted,
-                    activeTextColor: brand.text,
-                  },
-                  rightPanel: {
-                    backgroundColor: brand.surface,
-                    textColor: brand.text,
-                  },
-                  typography: {
-                    fontFamily: "Figtree, Arial, sans-serif",
-                    fontSize: "16px",
-                    lineHeight: "1.5",
-                    fontWeightRegular: "400",
-                    fontWeightBold: "700",
-                    fontWeightLight: "300",
-                    headings: {
-                      fontFamily: "Figtree, Arial, sans-serif",
-                      fontWeight: "700",
-                      lineHeight: "1.1",
-                    },
-                    code: {
-                      color: brand.text,
-                      backgroundColor: brand.codeBg,
-                      fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
-                      fontSize: "14px",
-                      lineHeight: "1.5",
-                    },
-                  },
-                  ...(useSchemaOverrides
-                    ? {
-                        schema: {
-                          defaultDetailsWidth: "75%",
-                          nestedBackground: brand.surfaceAlt,
-                          linesColor: brand.borderStrong,
-                          typeNameColor: brand.text,
-                          typeTitleColor: brand.text,
-                          requireLabelColor: brand.required,
-                          labelsTextSize: "13px",
-                          nestingSpacing: "1.15em",
-                        },
-                      }
-                    : {}),
-                },
-              }}
+              options={redocOptions}
             />
           );
         }}
