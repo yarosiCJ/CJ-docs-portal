@@ -207,8 +207,19 @@ Device retest after URL rewrite: diagrams visible again, pinch-zoom still crashe
 
 | # | Check | Result |
 | --- | --- | --- |
-| R2c-M1 | Pinch-zoom `/reference` with **no diagrams**, samples still visible | **pending device** |
-| R2c-M2 | Console `[CJ] redoc ios-lite` has `isolation: "no-svg"` and `diagramsLeft: 0` | **pending device** |
+| R2c-M1 | Pinch-zoom `/reference` with **no diagrams**, samples still visible | **fail** | User: images hidden, crash remains |
+| R2c-M2 | Console `[CJ] redoc ios-lite` has `isolation: "no-svg"` and `diagramsLeft: 0` | **pass** (user) | Images confirmed hidden |
 
-If R2c-M1 still crashes → next step hides request samples and restores SVGs. If it stops crashing → SVG rasterization is the cause.
+SVG rasterization is not sufficient to explain the crash.
+
+### Round 2d — isolation: SVGs back, no request samples (2026-09-22)
+
+**This step only:** restore diagram URL rewrite on iOS. Set `hideRequestPayloadSample: true` so request payload examples are not rendered. Response samples and diagrams stay. Desktop unchanged.
+
+| # | Check | Result |
+| --- | --- | --- |
+| R2d-M1 | Pinch-zoom `/reference` with diagrams visible, **no request samples** | **pending device** |
+| R2d-M2 | Console `isolation: "no-request-sample"` | **pending device** |
+
+If R2d-M1 still crashes → neither SVG nor request payload samples alone explain it. If it stops → request samples are the cause.
 

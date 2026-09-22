@@ -929,9 +929,3 @@ body {
   position: static !important;
 }
 
-/* Isolation step 1: hide any diagram that appears before JS removes it. */
-.redocPage.redoc-ios-lite img[src*='diagrams/out'],
-.redocPage.redoc-ios-lite img[src$='.svg'],
-.redocPage.redoc-ios-lite img[src*='.svg?'] {
-  display: none !important;
-}
