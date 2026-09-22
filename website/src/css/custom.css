@@ -928,8 +928,3 @@ body {
   /* Right samples column is often sticky; static reduces compositor layers on zoom. */
   position: static !important;
 }
-
-.redocPage.redoc-ios-lite img[src*='diagrams/out'],
-.redocPage.redoc-ios-lite img[src*='docs/diagrams/out'] {
-  display: none !important;
-}

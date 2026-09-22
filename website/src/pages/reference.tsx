@@ -228,6 +228,7 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
     const liteOptions = iosLite
       ? {
           // Fewer expanded sample/schema layers → smaller DOM under pinch-zoom.
+          // Keep request samples and diagrams visible (hideRequestPayloadSample / CSS hide removed after UX feedback).
           jsonSampleExpandLevel: 1,
           jsonSamplesExpandLevel: 1,
           schemaExpansionLevel: 0,
@@ -236,7 +237,6 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
           generatedSamplesMaxDepth: 2,
           expandResponses: "",
           pathInMiddlePanel: true,
-          hideRequestPayloadSample: true,
         }
       : {};
 
