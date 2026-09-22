@@ -299,13 +299,29 @@ body {
   line-height: 1.5 !important;
 }
 
-/* Redoc right panel (Request/Response samples): slightly smaller JSON for density */
+/* Redoc right panel (Request/Response samples): slightly smaller JSON for density.
+   Do not shrink .redoc-json code here: { } are direct children of code, while each
+   property row is an li at 16px. A smaller code font plus Infima's inline code
+   background paints the braces as a smaller chip. */
 .redocPage .react-tabs__tab-panel .redoc-json,
-.redocPage .react-tabs__tab-panel .redoc-json code,
 .redocPage .react-tabs__tab-panel pre,
 .redocPage .react-tabs__tab-panel code {
   font-size: 9px !important;
   line-height: 1.15 !important;
+}
+
+.redocPage .redoc-json code,
+.redocPage .react-tabs__tab-panel .redoc-json code,
+[data-theme='dark'] .redocPage .redoc-json code,
+[data-theme='dark'] .redocPage .react-tabs__tab-panel .redoc-json code {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  color: inherit !important;
+  font-size: 16px !important;
+  line-height: 1.5 !important;
 }
 
 .redocPage pre,
@@ -524,6 +540,29 @@ body {
 .redocPage .token.punctuation,
 .redocPage .token.operator {
   color: var(--cj-muted) !important;
+}
+
+/* Redoc paints expand/collapse (+/−) white, which disappears on the light sample panel. */
+.redocPage .redoc-json .collapser,
+.redocPage .redoc-json .collapser:after {
+  color: var(--cj-text) !important;
+}
+
+/* Sample field captions ("Content type", "Example") are position:absolute; top:-11px,
+   so the text sits on the control's top edge. Keep them in normal flow above the box. */
+.redocPage .react-tabs__tab-panel > div > div > span,
+.redocPage .react-tabs__tab-panel > div > div > div > span {
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  display: block;
+  margin: 10px 0 6px;
+  line-height: 1.2;
+}
+
+/* Redoc draws the sample dropdown chevron white. On the light gray control that disappears. */
+html:not([data-theme='dark']) .redocPage .react-tabs__tab-panel svg polyline {
+  color: #111111 !important;
 }
 
 .redocPage .token.comment,
