@@ -73,78 +73,105 @@ function ReferenceContent({ specUrl }: { specUrl: string }): React.ReactElement 
     const root = document.querySelector(".redocPage");
     if (!root) return;
 
+    let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+    let rafId: number | undefined;
+    let observer: MutationObserver;
+
+    const observeOptions: MutationObserverInit = { childList: true, subtree: true };
+
     const markRedocDecorations = () => {
-      root.querySelectorAll(".redoc-json .token.string").forEach((token) => {
-        const tokenText = token.textContent?.replace(/^"|"$/g, "") ?? "";
-        token.classList.toggle("json-url-value", /^https?:\/\//.test(tokenText));
-      });
-
-      root.querySelectorAll<HTMLAnchorElement>(".redoc-json a[href^='http']").forEach((link) => {
-        link.classList.add("json-url-value");
-
-        const previous = link.previousElementSibling;
-        const next = link.nextElementSibling;
-        previous?.classList.toggle(
-          "json-url-value",
-          previous.classList.contains("token") && previous.textContent === '"',
-        );
-        next?.classList.toggle(
-          "json-url-value",
-          next.classList.contains("token") && next.textContent === '"',
-        );
-      });
-
-      root.querySelectorAll<HTMLAnchorElement>("a[href]").forEach((link) => {
-        const isUtilityLink = Boolean(
-          link.closest(".redoc-json, pre, code, [role='tab'], button") ||
-            Array.from(link.classList).some((className) => /copy|expand|collapse/i.test(className)),
-        );
-        link.classList.toggle("redoc-description-link", !isUtilityLink);
-      });
-
-      root.querySelectorAll("table span, table div, table small").forEach((element) => {
-        const text = element.textContent?.trim().toLowerCase();
-        element.classList.toggle("redoc-required-label", text === "required");
-        element.classList.toggle("redoc-schema-constraint", text === "non-empty");
-      });
-
-      root.querySelectorAll("button, [role='tab']").forEach((element) => {
-        const text = element.textContent?.trim() ?? "";
-        const className = element.getAttribute("class") ?? "";
-        element.classList.toggle("redoc-status-success", /^2\d\d\b/.test(text) || className.includes("tab-success"));
-        element.classList.toggle("redoc-status-error", /^[45]\d\d\b/.test(text) || className.includes("tab-error"));
-      });
-
-      root.querySelectorAll("h5").forEach((heading) => {
-        if (heading.textContent?.trim() !== "Authorizations:") return;
-
-        const authHeaderColumn = heading.parentElement;
-        const authWrap = authHeaderColumn?.parentElement;
-        authWrap?.classList.add("redoc-auth-wrap");
-        authHeaderColumn?.classList.add("redoc-auth-header-column");
-        authWrap?.querySelectorAll(":scope > div").forEach((column) => {
-          if (column !== authHeaderColumn) column.classList.add("redoc-auth-securities-column");
+      observer.disconnect();
+      try {
+        root.querySelectorAll(".redoc-json .token.string").forEach((token) => {
+          const tokenText = token.textContent?.replace(/^"|"$/g, "") ?? "";
+          token.classList.toggle("json-url-value", /^https?:\/\//.test(tokenText));
         });
-      });
 
-      root.querySelectorAll<HTMLImageElement>("img[src*='/docs/diagrams/out/'], img[src*='docs/diagrams/out/']").forEach((img) => {
-        const currentSrc = img.getAttribute("src") ?? "";
-        const diagramMatch = currentSrc.match(/(?:^|\/)docs\/diagrams\/out\/([^/?#]+?)(?:-(?:dark|light))?\.svg([?#].*)?$/i);
-        if (!diagramMatch) return;
+        root.querySelectorAll<HTMLAnchorElement>(".redoc-json a[href^='http']").forEach((link) => {
+          link.classList.add("json-url-value");
 
-        const [, diagramName, suffix = ""] = diagramMatch;
-        const nextSrc = `${diagramsBaseUrl}${diagramName}-${isDark ? "dark" : "light"}.svg${suffix}`;
-        if (img.getAttribute("src") !== nextSrc) {
-          img.src = nextSrc;
-        }
-      });
+          const previous = link.previousElementSibling;
+          const next = link.nextElementSibling;
+          previous?.classList.toggle(
+            "json-url-value",
+            previous.classList.contains("token") && previous.textContent === '"',
+          );
+          next?.classList.toggle(
+            "json-url-value",
+            next.classList.contains("token") && next.textContent === '"',
+          );
+        });
+
+        root.querySelectorAll<HTMLAnchorElement>("a[href]").forEach((link) => {
+          const isUtilityLink = Boolean(
+            link.closest(".redoc-json, pre, code, [role='tab'], button") ||
+              Array.from(link.classList).some((className) => /copy|expand|collapse/i.test(className)),
+          );
+          link.classList.toggle("redoc-description-link", !isUtilityLink);
+        });
+
+        root.querySelectorAll("table span, table div, table small").forEach((element) => {
+          const text = element.textContent?.trim().toLowerCase();
+          element.classList.toggle("redoc-required-label", text === "required");
+          element.classList.toggle("redoc-schema-constraint", text === "non-empty");
+        });
+
+        root.querySelectorAll("button, [role='tab']").forEach((element) => {
+          const text = element.textContent?.trim() ?? "";
+          const className = element.getAttribute("class") ?? "";
+          element.classList.toggle("redoc-status-success", /^2\d\d\b/.test(text) || className.includes("tab-success"));
+          element.classList.toggle("redoc-status-error", /^[45]\d\d\b/.test(text) || className.includes("tab-error"));
+        });
+
+        root.querySelectorAll("h5").forEach((heading) => {
+          if (heading.textContent?.trim() !== "Authorizations:") return;
+
+          const authHeaderColumn = heading.parentElement;
+          const authWrap = authHeaderColumn?.parentElement;
+          authWrap?.classList.add("redoc-auth-wrap");
+          authHeaderColumn?.classList.add("redoc-auth-header-column");
+          authWrap?.querySelectorAll(":scope > div").forEach((column) => {
+            if (column !== authHeaderColumn) column.classList.add("redoc-auth-securities-column");
+          });
+        });
+
+        root.querySelectorAll<HTMLImageElement>("img[src*='/docs/diagrams/out/'], img[src*='docs/diagrams/out/']").forEach((img) => {
+          const currentSrc = img.getAttribute("src") ?? "";
+          const diagramMatch = currentSrc.match(/(?:^|\/)docs\/diagrams\/out\/([^/?#]+?)(?:-(?:dark|light))?\.svg([?#].*)?$/i);
+          if (!diagramMatch) return;
+
+          const [, diagramName, suffix = ""] = diagramMatch;
+          const nextSrc = `${diagramsBaseUrl}${diagramName}-${isDark ? "dark" : "light"}.svg${suffix}`;
+          if (img.getAttribute("src") !== nextSrc) {
+            img.src = nextSrc;
+          }
+        });
+      } finally {
+        observer.observe(root, observeOptions);
+      }
     };
 
-    markRedocDecorations();
-    const observer = new MutationObserver(markRedocDecorations);
-    observer.observe(root, { childList: true, subtree: true });
+    const scheduleMarkRedocDecorations = () => {
+      if (debounceTimer !== undefined) clearTimeout(debounceTimer);
+      if (rafId !== undefined) cancelAnimationFrame(rafId);
+      debounceTimer = setTimeout(() => {
+        debounceTimer = undefined;
+        rafId = requestAnimationFrame(() => {
+          rafId = undefined;
+          markRedocDecorations();
+        });
+      }, 120);
+    };
 
-    return () => observer.disconnect();
+    observer = new MutationObserver(scheduleMarkRedocDecorations);
+    markRedocDecorations();
+    observer.observe(root, observeOptions);
+
+    return () => {
+      if (debounceTimer !== undefined) clearTimeout(debounceTimer);
+      if (rafId !== undefined) cancelAnimationFrame(rafId);
+      observer.disconnect();
+    };
   }, [diagramsBaseUrl, isDark]);
 
   return (
